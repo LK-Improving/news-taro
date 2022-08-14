@@ -1,0 +1,13 @@
+{
+  "miniprogramRoot": "./",
+  "projectname": "news-taro",
+  "description": "新闻taro",
+  "appid": "touristappid",
+  "setting": {
+    "urlCheck": true,
+    "es6": false,
+    "postcss": false,
+    "minified": false
+  },
+  "compileType": "miniprogram"
+}

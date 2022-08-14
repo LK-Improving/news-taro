@@ -1,0 +1,26 @@
+.homeContailer{
+    padding: 10px 20px;
+    // 搜索栏
+    .serach{
+        height: 60px;
+        // background-color: #e98e97;
+        display: flex;
+        line-height: 60px;
+        .imput{
+            flex: 1;
+            border: 1px solid #e98e97;
+            border-radius: 60px;
+            padding-left: 20px;
+            margin-right: 15px;
+            display: flex;
+        }
+        .iconfont{
+            font-size: 30px;
+            border-radius: 30px;
+            background-color: #e98e97;
+            color: white;
+            padding: 0 15px;
+        }
+    }
+    
+}
