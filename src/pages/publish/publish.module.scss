@@ -1,0 +1,14 @@
+.editorToolbox{
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 999;
+    background-color: #EDEDED;
+    display: flex;
+    padding: 5px;
+    box-sizing: border-box;
+    line-height: 1.6;
+    .toolIconfont{
+        font-size: 48px;
+    }
+}

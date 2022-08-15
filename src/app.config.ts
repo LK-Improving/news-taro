@@ -1,7 +1,10 @@
 export default defineAppConfig({
   pages: [
+    'pages/publish/publish',
+    'pages/my/my',
     'pages/home/home',
-    'pages/my/my'
+    
+    'pages/search/search'
   ],
   window: {
     backgroundTextStyle: 'light',
@@ -18,7 +21,7 @@ export default defineAppConfig({
       selectedIconPath: './assets/images/主页-selected.png'
     }, {
       pagePath: 'pages/my/my',
-      text: '个人',
+      text: '我的',
       iconPath: './assets/images/个人.png',
       selectedIconPath: './assets/images/个人-selected.png'
     }]

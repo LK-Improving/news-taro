@@ -1,20 +1,24 @@
-.homeContailer{
+.homeContainer {
     padding: 10px 20px;
+
     // 搜索栏
-    .serach{
+    .serach {
         height: 60px;
         // background-color: #e98e97;
         display: flex;
         line-height: 60px;
-        .imput{
+
+        .imput {
             flex: 1;
             border: 1px solid #e98e97;
             border-radius: 60px;
             padding-left: 20px;
             margin-right: 15px;
             display: flex;
+            font-size: 32px
         }
-        .iconfont{
+
+        .iconfont {
             font-size: 30px;
             border-radius: 30px;
             background-color: #e98e97;
@@ -22,5 +26,63 @@
             padding: 0 15px;
         }
     }
-    
+
+    // 导航栏
+    .navScroll {
+        display: flex;
+        white-space: nowrap;
+        height: 70px;
+
+        .navItem {
+            background-color: white;
+            height: 60px;
+            line-height: 60px;
+            margin-right: 20px;
+            font-size: 32px;
+        }
+
+        .active {
+            color: #e98e97;
+            border-bottom: 1px solid #e98e97;
+        }
+    }
+
+    .contentScroll {
+        height: calc(100vh - 150px);
+
+        .contentItem {
+            height: 180px;
+            padding: 20px 0;
+            display: flex;
+            border-bottom: 1px solid #d7d7d7;
+
+            .content {
+                flex: 1;
+
+                .title {
+                    //多行文本溢出隐藏用...代替
+                    height: 150px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    line-height: 50px;
+                    display: -webkit-box;
+                    -webkit-box-orient: vertical; // 设置对齐模式：垂直
+                    -webkit-line-clamp: 3;
+                }
+
+                .detail {
+                    line-height: 30px;
+                    font-size: 30px;
+                    color: #9d9d9d;
+                    display: flex;
+                    justify-content: space-between;
+                }
+            }
+
+            .contentImage {
+                width: 200px;
+                height: 180px;
+            }
+        }
+    }
 }

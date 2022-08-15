@@ -1,47 +1,107 @@
 import React, { useEffect } from 'react'
-import { View, Button, Text } from '@tarojs/components'
-import counter from '../../store/counter'
+import { View, Button, Text, Image } from '@tarojs/components'
 
-import './my.scss'
+import Style from './my.module.scss'
 
-type PageStateProps = {
-  store: {
-    counterStore: {
-      counter: number,
-      increment: Function,
-      decrement: Function,
-      incrementAsync: Function
-    }
-  }
-}
-
-const Home:React.FC<PageStateProps> = (props)=> {
-  useEffect(()=>{
-    console.log(counter);
-    
-  },[])
-  const increment = () => {
-    console.log(counter);
-    
-    counter.increment()
-  }
-
-  const decrement = () => {
-    counter.decrement()
-  }
-
-  const incrementAsync = () => {
-    counter.incrementAsync()
-  }
-  return(
-    <View className='index'>
-        <Button onClick={increment}>+</Button>
-        <Button onClick={decrement}>-</Button>
-        <Button onClick={incrementAsync}>Add Async</Button>
-        <Text>{counter.counter}</Text>
+const My: React.FC = () => {
+  return (
+    <View className={Style.myContainer}>
+      {/* 用户部分 */}
+      <View className={Style.userSection}>
+        <View className={Style.userInfo}>
+          <Image className={Style.portrait} src='/assets/images/个人-selected.png' />
+          <View>
+            <View>lk</View>
+            <View className={Style.UID}>UID:1220145515</View>
+          </View>
+        </View>
+        <View>
+          <Text className={Style.personal}>
+            个人主页
+          </Text>
+          <Text className={'iconfont icon-right ' + Style.iconfont}></Text>
+        </View>
       </View>
+      {/* 用户Cards */}
+      <View className={Style.userCards}>
+        <View className={Style.card}>
+          <View className={Style.num}>0</View>
+          <View>资讯</View>
+        </View>
+        <View className={Style.card}>
+          <View className={Style.num}>0</View>
+          <View>获赞</View>
+        </View>
+        <View className={Style.card}>
+          <View className={Style.num}>0</View>
+          <View>粉丝</View>
+        </View>
+        <View className={Style.card}>
+          <View className={Style.num}>0</View>
+          <View>关注</View>
+        </View>
+      </View>
+      {/* 用户导航 */}
+      <View className={Style.userCards}>
+        <View className={Style.card}>
+          <View className={'iconfont icon-dianzan ' + Style.navIconfont}></View>
+          <View>点赞</View>
+        </View>
+        <View className={Style.card}>
+          <View className={'iconfont icon-shoucang ' + Style.navIconfont}></View>
+          <View>收藏</View>
+        </View>
+        <View className={Style.card}>
+          <View className={'iconfont icon-pinglun ' + Style.navIconfont}></View>
+          <View>评论</View>
+        </View>
+        <View className={Style.card}>
+          <View className={'iconfont icon-lishi ' + Style.navIconfont}></View>
+          <View>浏览历史</View>
+        </View>
+      </View>
+      {/* 用户导航2 */}
+      <View className={Style.handleList}>
+        <View className={Style.handleItem}>
+          <View>
+            <Text className={Style.listIconfont + ' iconfont icon-dianzan'}></Text>
+            <Text >点赞</Text>
+          </View>
+          <View>
+            <Text className={'iconfont icon-right ' + Style.iconfont}></Text>
+          </View>
+        </View>
+        <View className={Style.handleItem}>
+          <View>
+            <Text className={Style.listIconfont + ' iconfont icon-shoucang'}></Text>
+            <Text >收藏</Text>
+          </View>
+          <View>
+            <Text className={'iconfont icon-right ' + Style.iconfont}></Text>
+          </View>
+        </View>
+        <View className={Style.handleItem}>
+          <View>
+            <Text className={Style.listIconfont + ' iconfont icon-pinglun'}></Text>
+            <Text >评论</Text>
+          </View>
+          <View>
+            <Text className={'iconfont icon-right ' + Style.iconfont}></Text>
+          </View>
+        </View>
+        <View className={Style.handleItem}>
+          <View>
+            <Text className={Style.listIconfont + ' iconfont icon-lishi'}></Text>
+            <Text >历史</Text>
+          </View>
+          <View>
+            <Text className={'iconfont icon-right ' + Style.iconfont}></Text>
+          </View>
+        </View>
+      </View>
+    </View>
   )
 }
 
-export default Home
+export default My
 

@@ -1,0 +1,75 @@
+.myContainer {
+    padding: 20px;
+    // 用户部分
+    .userSection {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 10px 40px;
+        .userInfo {
+            display: flex;
+            line-height: 50px;
+            .portrait {
+                width: 100px;
+                height: 100px;
+                border-radius: 50%;
+                background-color: aqua;
+                margin-right: 20px;
+            }
+            .UID{
+                font-size: 24px;
+                color: #9d9d9d;
+            }
+        }
+        .personal{
+            color: #9d9d9d;
+            font-size: 24px;
+        }
+    }
+    // 用户Cards
+    .userCards{
+        display: flex;
+        height: 100px;
+        margin: 50px 0;
+        .card{
+            width: 25%;
+            color:#9d9d9d;
+            font-size: 24px;
+            text-align: center;
+            line-height: 50px;
+            .num{
+                font-size: 32px;
+                color: black;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+    }
+    .iconfont{
+        color: #9d9d9d;
+        font-size: 32px;
+    }
+    .navIconfont{
+        color: #e98e97;
+        font-size: 48px;
+    }
+    .listIconfont{
+        color: #e98e97;
+        font-size: 36px;
+        margin-right: 20px;
+    }
+    // 操作List
+    .handleList{
+        display: flex;
+        flex-direction: column;
+        .handleItem{
+            padding:  0 30px;
+            height: 112px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 24px;
+        }
+    }
+}
