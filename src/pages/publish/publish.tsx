@@ -365,7 +365,8 @@ const Publish: React.FC = () => {
         <View>封面预览</View>
         <View className={Style.contentItem}>
           <View className={Style.content}>
-            <Text className={Style.title}>51545</Text>
+            <Text className={Style.title}>{formData.title}</Text>
+            <Text style={{backgroundColor: "white"}}></Text>
             <View className={Style.detail}>
               <text>lk</text>
               <text>11122评论</text>
@@ -383,7 +384,7 @@ const Publish: React.FC = () => {
       <View className={Style.Block}>
         <View className={Style.buttonGroup}>
           <Button className={Style.publishBtn}>发布</Button>
-          <Button className={Style.saveBtn}>保存草稿</Button>
+          <Button className={Style.saveBtn}>存草稿</Button>
         </View>
       </View>
     </View>

@@ -1,3 +1,6 @@
+
+import { resolve } from 'path'
+
 const config = {
   projectName: 'news-taro',
   date: '2022-8-14',
@@ -10,6 +13,12 @@ const config = {
   sourceRoot: 'src',
   outputRoot: 'dist',
   plugins: [],
+  // sass
+  sass:{
+    resource: ['src/static/style/global.scss'],
+    projectDirectory: resolve(__dirname, '..'),
+    // data: '$primaryColor: #e98e97'
+  },
   defineConstants: {
   },
   copy: {
@@ -66,7 +75,7 @@ const config = {
   }
 }
 
-module.exports = function (merge) {
+export default function (merge) {
   if (process.env.NODE_ENV === 'development') {
     return merge({}, config, require('./dev'))
   }

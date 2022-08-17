@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3587140 */
-  src: url('//at.alicdn.com/t/c/font_3587140_c9cee1ycl7q.woff2?t=1660579008927') format('woff2'),
-       url('//at.alicdn.com/t/c/font_3587140_c9cee1ycl7q.woff?t=1660579008927') format('woff'),
-       url('//at.alicdn.com/t/c/font_3587140_c9cee1ycl7q.ttf?t=1660579008927') format('truetype');
+  src: url('//at.alicdn.com/t/c/font_3587140_ggl83umrnq.woff2?t=1660751827454') format('woff2'),
+       url('//at.alicdn.com/t/c/font_3587140_ggl83umrnq.woff?t=1660751827454') format('woff'),
+       url('//at.alicdn.com/t/c/font_3587140_ggl83umrnq.ttf?t=1660751827454') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,22 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-clear1:before {
+  content: "\e710";
+}
+
+.icon-weixin:before {
+  content: "\e607";
+}
+
+.icon-lock:before {
+  content: "\e6b4";
+}
+
+.icon-a-011-smartphone-1:before {
+  content: "\e628";
 }
 
 .icon-redo:before {

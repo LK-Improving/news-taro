@@ -1,5 +1,8 @@
 export default defineAppConfig({
   pages: [
+    'pages/Login/login',
+    'pages/register/register',
+    
     'pages/publish/publish',
     'pages/my/my',
     'pages/home/home',
@@ -17,13 +20,13 @@ export default defineAppConfig({
     list: [{
       pagePath: 'pages/home/home',
       text: '首页',
-      iconPath: './assets/images/主页.png',
-      selectedIconPath: './assets/images/主页-selected.png'
+      iconPath: './assets/images/tabBar/主页.png',
+      selectedIconPath: './assets/images/tabBar/主页-selected.png'
     }, {
       pagePath: 'pages/my/my',
       text: '我的',
-      iconPath: './assets/images/个人.png',
-      selectedIconPath: './assets/images/个人-selected.png'
+      iconPath: './assets/images/tabBar/个人.png',
+      selectedIconPath: './assets/images/tabBar/个人-selected.png'
     }]
   }
 })

@@ -1,0 +1,19 @@
+//  默认颜色
+$primaryColor:#e98e97;
+
+@mixin defaultBtn {
+    color: $primaryColor;
+    border: 1px solid $primaryColor;
+    background-color: white;
+}
+
+@mixin activeBtn {
+    color: white;
+    background-color: $primaryColor;
+}
+
+@mixin handleStyle {
+    border-left: 1px solid #9d9d9d;
+    padding-left: 20px;
+    color: $primaryColor;
+}

@@ -39,7 +39,7 @@ const Home: React.FC = () => {
     <View className={Style.homeContainer}>
       {/* 搜索栏 */}
       <View className={Style.serach}>
-        <View className={Style.imput} onClick={toSearch}>
+        <View className={Style.imput} onClick={()=>to('pages/search/search')}>
           <Text className='iconfont icon-sousuo' style={{ fontSize: '40rpx' }}></Text>
           <Input placeholder='搜索喜欢的新闻吧！' placeholderStyle='font-size:32rpx' />
         </View>
