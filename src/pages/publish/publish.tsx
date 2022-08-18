@@ -322,7 +322,7 @@ const Publish: React.FC = () => {
           onClick={save}
         />
       </View>
-      {/* 内容富文本框 */}
+      {/* 内容富文本框编辑器 */}
       <View className={Style.Block}>
         <mpWeixin
           id="article"

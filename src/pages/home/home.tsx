@@ -82,7 +82,7 @@ const Home: React.FC = () => {
                     <text>X</text>
                   </View>
                   </View>
-                <Image className={Style.contentImage} src='/assets/images/个人-selected.png' />
+                <Image className={Style.contentImage} src='/assets/images/tabBar/个人-selected.png' />
               </View>
             )
           })

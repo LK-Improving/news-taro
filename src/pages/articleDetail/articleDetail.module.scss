@@ -1,0 +1,72 @@
+.articleDetailContainer {
+    padding: 20px;
+
+    .coverSwiper {
+        height: 500px;
+        position: relative;
+        image {
+            height: 500px;
+        }
+    }
+
+    .artcileHeader {
+        position: relative;
+        margin-top: -150px;
+        background-color: white;
+        .arc{
+            position: absolute;
+            top: -36px;
+            height: 36px;
+        }
+        .title{
+            font-size: 48px;
+        }
+        .detail {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+            image{
+                width: 80px;
+                height: 80px;
+                border-radius: 80px;
+                border: 1px solid $primaryColor;
+            }
+            .infoSection{
+                flex: 1;
+                height: 80px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                margin: 0 20px;
+                .author {
+                    font-size: 36px;
+                }
+
+                .info {
+                    color: #9d9d9d;
+                    font-size: 24px;
+                }
+            }
+           button{
+            font-size: 32px;
+            height: 60px;
+            line-height: 60px;
+            border-radius: 5px;
+            @include activeBtn
+           }
+        }
+    }
+    .artcileFooter{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .footerLeft{
+            font-size: 32px;
+        }
+        .FooterRight{
+            font-size: 24px;
+            color: #9d9d9d;
+            display: flex;
+        }
+    }
+}

@@ -1,12 +1,11 @@
 export default defineAppConfig({
   pages: [
+    'pages/articleDetail/articleDetail',
     'pages/Login/login',
     'pages/register/register',
-    
     'pages/publish/publish',
     'pages/my/my',
     'pages/home/home',
-    
     'pages/search/search'
   ],
   window: {
