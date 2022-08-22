@@ -6,20 +6,23 @@ import {
   Image,
   Swiper,
   SwiperItem,
-  EventProps
+  EventProps,
+  Block,
+  Textarea
 } from "@tarojs/components";
 
 import Style from "./articleDetail.module.scss";
 
 import arcImag from "../../assets/images/arc.png";
+import { useShareAppMessage } from "@tarojs/taro";
 
 interface UserType {
   nickName: string;
   portrait: string;
-};
+}
 
 type ArticleType = {
-  userInfo: UserType
+  userInfo: UserType;
   readCount: Number;
   title: string;
   content: string;
@@ -28,10 +31,10 @@ type ArticleType = {
   collectionNum: number;
   cover: string;
   publishTime: string;
-  commonList: Array< UserType& {common:string}>
+  commonList: Array<UserType & { common: string }>;
 };
 
-const My: React.FC = () => {
+const ArticleDetail: React.FC = (props) => {
   const [articleDetail, setArticleDetail] = useState<ArticleType>({
     userInfo: {
       nickName: "admin",
@@ -48,12 +51,36 @@ const My: React.FC = () => {
     commonList: []
   });
 
+  // 评论
+  const [common, setCommon] = useState<string>("");
+
+  // 键盘高度
+  const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
+
+  // 是否显示
+  const [visible, setVisible] = useState<boolean>(false);
+
+  // 是否点赞
+  const [isLike, setIsLike] = useState<boolean>(false);
+
+  // 是否收藏
+  const [isCollection, setIsCollection] = useState<boolean>(false);
+
   const [coverTransform, setCoverTransForm] = useState<string>("");
+
   const [coverTransition, setCoverTransiton] = useState<string>("");
 
   let startY = 0; // 手指起始的坐标
   let moveY = 0; // 手指移动的坐标
   let moveDistance = 0; // 手指移动的距离
+
+  const showConfirmBar = false;
+
+
+  useEffect(()=>{
+    console.log(props);
+    
+  })
 
   // 手指触摸开始操作
   const handleTouchStart: EventProps["onTouchStart"] = e => {
@@ -82,6 +109,28 @@ const My: React.FC = () => {
     setCoverTransForm(`translateY(0)`);
     setCoverTransiton("transform .5s linear");
   };
+
+  // 点赞/取消点赞
+  const handleLike: EventProps["onClick"] = () => {
+    setIsLike(!isLike);
+  };
+
+  // 收藏/取消收藏
+  const handleCollection: EventProps["onClick"] = () => {
+    setIsCollection(!isCollection);
+  };
+
+  // 分享
+  const handleShare = useShareAppMessage(res => {
+    if (res.from === "button") {
+      // 来自页面内转发按钮
+      console.log(res.target);
+    }
+    return {
+      title: articleDetail.title,
+      path: "/page/user?id=123"
+    };
+  });
 
   return (
     <View className={Style.articleDetailContainer}>
@@ -132,9 +181,12 @@ const My: React.FC = () => {
             domain="https://mp-html.oss-cn-hangzhou.aliyuncs.com"
           />
         </View>
+
         {/* 点赞，收藏，转发， */}
         <View className={Style.artcileFooter}>
-          <View className={Style.footerLeft}>评论&nbsp;{articleDetail.commonList.length}</View>
+          <View className={Style.footerLeft}>
+            评论&nbsp;{articleDetail.commonList.length}
+          </View>
           <View className={Style.FooterRight}>
             <View>{articleDetail.like}&nbsp;赞</View>
             <View>&nbsp;|&nbsp;</View>
@@ -142,8 +194,86 @@ const My: React.FC = () => {
           </View>
         </View>
       </View>
+
+      {/* 操作栏 */}
+      <View
+        className={Style.handleBar}
+        // style={{ bottom: keyboardHeight + "rpx" }}
+      >
+        {!visible ? (
+          <Block>
+            <View className={Style.white} onClick={() => setVisible(true)}>
+              <Text
+                className="iconfont icon-shuru"
+                style={{ fontSize: "32rpx" }}
+              ></Text>
+              <Text>&nbsp;写评论···</Text>
+            </View>
+            <Button onClick={handleLike}>
+              <Text
+                className={
+                  isLike
+                    ? "iconfont icon-dianzan_kuai " + Style.handleOption
+                    : "iconfont icon-dianzan " + Style.handleOption
+                }
+                style={{ color: isLike ? "#e98e97" : "" }}
+                onClick={handleLike}
+              ></Text>
+            </Button>
+
+            <Button onClick={handleCollection}>
+              <Text
+                className={
+                  isCollection
+                    ? "iconfont icon-shoucang_kuai " + Style.handleOption
+                    : "iconfont icon-shoucang " + Style.handleOption
+                }
+                style={{ color: isCollection ? "#e98e97" : "" }}
+                onClick={handleCollection}
+              ></Text>
+            </Button>
+
+            <Button openType="share" onClick={() => handleShare}>
+              <Text
+                className={"iconfont icon-zhuanfa " + Style.handleOption}
+                style={{ color: "#e98e97" }}
+              ></Text>
+            </Button>
+          </Block>
+        ) : (
+          <Block>
+            <Textarea
+              className={Style.textarea}
+              placeholder="发个友善的评论吧！"
+              placeholderStyle="color: #868080;"
+              fixed
+              value={common}
+              onInput={e => setCommon(e.detail.value)}
+              autoFocus
+              autoHeight
+              showConfirmBar={showConfirmBar}
+              adjustPosition={false}
+              onFocus={e => {
+                console.log(e);
+                setKeyboardHeight(8);
+              }}
+              onBlur={e => {
+                console.log(e);
+                setKeyboardHeight(0);
+                setVisible(false);
+              }}
+            ></Textarea>
+            <Text
+              className={Style.publish}
+              style={{ color: common ? "#e98e97" : "#868080" }}
+            >
+              发布
+            </Text>
+          </Block>
+        )}
+      </View>
     </View>
   );
 };
 
-export default My;
+export default ArticleDetail;

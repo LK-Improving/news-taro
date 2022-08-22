@@ -13,7 +13,7 @@ const config = {
   sourceRoot: 'src',
   outputRoot: 'dist',
   plugins: [],
-  // sass
+  // sass全局注入
   sass:{
     resource: ['src/static/style/global.scss'],
     projectDirectory: resolve(__dirname, '..'),

@@ -16,7 +16,7 @@ const Home: React.FC = () => {
 
   }, [])
 
-  const handleClick: EventProps['onClick'] = (e) => {
+  const handleChangeType: EventProps['onClick'] = (e) => {
     console.log(e)
     setKey(e.currentTarget.id)
   }
@@ -29,17 +29,22 @@ const Home: React.FC = () => {
   }
 
   // 前往搜索页面
-  const to = (url) => {
+  const toSearch = () => {
     Taro.navigateTo({
-      url
+      url: 'pages/search/search'
     })
   }
 
+  const toDetail = (id)=>{
+    Taro.navigateTo({
+      url: '/page/articleDetail/articleDetail?id=' + id
+    })
+  }
   return (
     <View className={Style.homeContainer}>
       {/* 搜索栏 */}
       <View className={Style.serach}>
-        <View className={Style.imput} onClick={()=>to('pages/search/search')}>
+        <View className={Style.imput} onClick={toSearch}>
           <Text className='iconfont icon-sousuo' style={{ fontSize: '40rpx' }}></Text>
           <Input placeholder='搜索喜欢的新闻吧！' placeholderStyle='font-size:32rpx' />
         </View>
@@ -56,7 +61,7 @@ const Home: React.FC = () => {
         {
           [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(item => {
             return (
-              <View key={item} onClick={handleClick} id={item.toString()} className={key === item.toString() ? Style.navItem + ' ' + Style.active : Style.navItem}>科技</View>
+              <View key={item} onClick={handleChangeType} id={item.toString()} className={key === item.toString() ? Style.navItem + ' ' + Style.active : Style.navItem}>科技</View>
             )
           })
         }
@@ -72,7 +77,7 @@ const Home: React.FC = () => {
         {
           [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(item => {
             return (
-              <View key={item} onClick={handleClick} id={item.toString()} className={Style.contentItem}>
+              <View key={item} onClick={e=>toDetail(e.currentTarget.id)} id={item.toString()} className={Style.contentItem}>
                 <View className={Style.content}>
                   <Text className={Style.title}>51545</Text>
                   <View className={Style.detail}>

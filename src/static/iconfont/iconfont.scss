@@ -1,8 +1,8 @@
 @font-face {
   font-family: "iconfont"; /* Project id 3587140 */
-  src: url('//at.alicdn.com/t/c/font_3587140_ggl83umrnq.woff2?t=1660751827454') format('woff2'),
-       url('//at.alicdn.com/t/c/font_3587140_ggl83umrnq.woff?t=1660751827454') format('woff'),
-       url('//at.alicdn.com/t/c/font_3587140_ggl83umrnq.ttf?t=1660751827454') format('truetype');
+  src: url('//at.alicdn.com/t/c/font_3587140_crwov28176.woff2?t=1661047628329') format('woff2'),
+       url('//at.alicdn.com/t/c/font_3587140_crwov28176.woff?t=1661047628329') format('woff'),
+       url('//at.alicdn.com/t/c/font_3587140_crwov28176.ttf?t=1661047628329') format('truetype');
 }
 
 .iconfont {
@@ -11,6 +11,26 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-shoucang_kuai:before {
+  content: "\e86d";
+}
+
+.icon-dianzan_kuai:before {
+  content: "\ec8c";
+}
+
+.icon-zhuanfa1:before {
+  content: "\e63d";
+}
+
+.icon-zhuanfa:before {
+  content: "\e629";
+}
+
+.icon-shuru:before {
+  content: "\ec7c";
 }
 
 .icon-clear1:before {

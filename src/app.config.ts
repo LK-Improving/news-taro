@@ -1,12 +1,13 @@
 export default defineAppConfig({
   pages: [
+    'pages/search/search',
     'pages/articleDetail/articleDetail',
     'pages/Login/login',
     'pages/register/register',
     'pages/publish/publish',
     'pages/my/my',
-    'pages/home/home',
-    'pages/search/search'
+    'pages/home/home'
+    
   ],
   window: {
     backgroundTextStyle: 'light',

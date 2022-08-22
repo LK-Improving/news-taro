@@ -2,7 +2,6 @@ import { Component } from 'react'
 // import { Provider } from 'mobx-react'
 import { View } from '@tarojs/components'
 // import counterStore from './store/counter'
-
 import './app.scss'
 
 // const store = {

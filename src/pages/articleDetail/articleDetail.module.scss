@@ -4,7 +4,9 @@
     .coverSwiper {
         height: 500px;
         position: relative;
+
         image {
+            width: 100%;
             height: 500px;
         }
     }
@@ -13,31 +15,38 @@
         position: relative;
         margin-top: -150px;
         background-color: white;
-        .arc{
+
+        .arc {
             position: absolute;
             top: -36px;
             height: 36px;
+            width: 100%;
         }
-        .title{
+
+        .title {
             font-size: 48px;
         }
+
         .detail {
             display: flex;
             align-items: center;
             margin: 20px 0;
-            image{
+
+            image {
                 width: 80px;
                 height: 80px;
                 border-radius: 80px;
                 border: 1px solid $primaryColor;
             }
-            .infoSection{
+
+            .infoSection {
                 flex: 1;
                 height: 80px;
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
                 margin: 0 20px;
+
                 .author {
                     font-size: 36px;
                 }
@@ -47,26 +56,84 @@
                     font-size: 24px;
                 }
             }
-           button{
-            font-size: 32px;
-            height: 60px;
-            line-height: 60px;
-            border-radius: 5px;
-            @include activeBtn
-           }
+
+            button {
+                font-size: 32px;
+                height: 60px;
+                line-height: 60px;
+                border-radius: 5px;
+                @include activeBtn
+            }
         }
     }
-    .artcileFooter{
+
+    .artcileFooter {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        .footerLeft{
+
+        .footerLeft {
             font-size: 32px;
         }
-        .FooterRight{
+
+        .FooterRight {
             font-size: 24px;
             color: #9d9d9d;
             display: flex;
+        }
+    }
+
+    .handleBar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 999;
+        width: calc(100% - 40px);
+        display: flex;
+        justify-content: space-between;
+        background-color: white;
+        padding: 20px;
+        align-items: flex-end;
+
+        button {
+            background: transparent;
+            display: inline;
+            padding: 0;
+            line-height: 60px;
+            margin-left: 20px;
+            border-color: transparent;
+
+            &:after {
+                border: none;
+            }
+        }
+
+        .white {
+            flex: 1;
+            background-color: #f6f6f6;
+            color: #868080;
+            font-size: 32px;
+            line-height: 60px;
+            height: 60px;
+            padding-left: 20px;
+            border-radius: 80px;
+        }
+
+        .handleOption {
+            font-size: 60px;
+        }
+
+        .textarea {
+            background-color: #f6f6f6;
+            font-size: 32px;
+            flex: 1;
+            padding: 10px;
+            border-radius: 15px;
+        }
+
+        .publish {
+            margin-left: 20px;
+            cursor: pointer;
         }
     }
 }
