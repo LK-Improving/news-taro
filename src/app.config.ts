@@ -1,9 +1,10 @@
 export default defineAppConfig({
   pages: [
+    'pages/mobxDemo/mobxDemo',
+    'pages/register/register',
+    'pages/login/login',
     'pages/search/search',
     'pages/articleDetail/articleDetail',
-    'pages/Login/login',
-    'pages/register/register',
     'pages/publish/publish',
     'pages/my/my',
     'pages/home/home'

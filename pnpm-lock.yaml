@@ -32,8 +32,9 @@ specifiers:
   eslint-plugin-import: ^2.12.0
   eslint-plugin-react: ^7.8.2
   eslint-plugin-react-hooks: ^4.2.0
-  mobx: ^4.8.0
-  mobx-react: ^6.1.4
+  mobx: ^6.6.1
+  mobx-react-lite: ^3.4.0
+  mobx-state-tree: ^5.1.6
   mp-html: ^2.3.2
   preact: ^10.5.15
   stylelint: 9.3.0
@@ -56,8 +57,9 @@ dependencies:
   '@tarojs/shared': 3.5.2
   '@tarojs/taro': 3.5.2_@types+react@18.0.17
   '@tarojs/taro-h5': 3.5.2_@types+react@18.0.17
-  mobx: 4.15.7
-  mobx-react: 6.3.1_mobx@4.15.7
+  mobx: 6.6.1
+  mobx-react-lite: 3.4.0_mobx@6.6.1
+  mobx-state-tree: 5.1.6_mobx@6.6.1
   mp-html: 2.3.2
   preact: 10.10.2
 
@@ -9032,11 +9034,11 @@ packages:
   /mobile-detect/1.4.5:
     resolution: {integrity: sha512-yc0LhH6tItlvfLBugVUEtgawwFU2sIe+cSdmRJJCTMZ5GEJyLxNyC/NIOAOGk67Fa8GNpOttO3Xz/1bHpXFD/g==}
 
-  /mobx-react-lite/2.2.2_mobx@4.15.7:
-    resolution: {integrity: sha512-2SlXALHIkyUPDsV4VTKVR9DW7K3Ksh1aaIv3NrNJygTbhXe2A9GrcKHZ2ovIiOp/BXilOcTYemfHHZubP431dg==}
+  /mobx-react-lite/3.4.0_mobx@6.6.1:
+    resolution: {integrity: sha512-bRuZp3C0itgLKHu/VNxi66DN/XVkQG7xtoBVWxpvC5FhAqbOCP21+nPhULjnzEqd7xBMybp6KwytdUpZKEgpIQ==}
     peerDependencies:
-      mobx: ^4.0.0 || ^5.0.0
-      react: ^16.8.0
+      mobx: ^6.1.0
+      react: ^16.8.0 || ^17 || ^18
       react-dom: '*'
       react-native: '*'
     peerDependenciesMeta:
@@ -9045,24 +9047,19 @@ packages:
       react-native:
         optional: true
     dependencies:
-      mobx: 4.15.7
+      mobx: 6.6.1
     dev: false
 
-  /mobx-react/6.3.1_mobx@4.15.7:
-    resolution: {integrity: sha512-IOxdJGnRSNSJrL2uGpWO5w9JH5q5HoxEqwOF4gye1gmZYdjoYkkMzSGMDnRCUpN/BNzZcFoMdHXrjvkwO7KgaQ==}
+  /mobx-state-tree/5.1.6_mobx@6.6.1:
+    resolution: {integrity: sha512-t4YNI3taTvDTMCyjA/bmX90HpPUMJEHX1OvyJqbfR6iOIWkJk+JbWc1aozIZxh2M5VA8xtHGnzu/2YGzSPUpJQ==}
     peerDependencies:
-      mobx: ^5.15.4 || ^4.15.4
-      react: ^16.8.0 || 16.9.0-alpha.0
+      mobx: ^6.3.0
     dependencies:
-      mobx: 4.15.7
-      mobx-react-lite: 2.2.2_mobx@4.15.7
-    transitivePeerDependencies:
-      - react-dom
-      - react-native
+      mobx: 6.6.1
     dev: false
 
-  /mobx/4.15.7:
-    resolution: {integrity: sha512-X4uQvuf2zYKHVO5kRT5Utmr+J9fDnRgxWWnSqJ4oiccPTQU38YG+/O3nPmOhUy4jeHexl7XJJpWDBgEnEfp+8w==}
+  /mobx/6.6.1:
+    resolution: {integrity: sha512-7su3UZv5JF+ohLr2opabjbUAERfXstMY+wiBtey8yNAPoB8H187RaQXuhFjNkH8aE4iHbDWnhDFZw0+5ic4nGQ==}
     dev: false
 
   /mp-html/2.3.2:

@@ -12,34 +12,41 @@ import {
   CommonEventFunction
 } from "@tarojs/components";
 import Style from "./register.module.scss";
+// eslint-disable-next-line import/first
 import Taro from "@tarojs/taro";
 import lockImg from "../../assets/images/login/lock.svg";
 import weixinImg from "../../assets/images/login/weixin.svg";
+import { isMobile } from "../..//utils/validate";
+import memberApi from "../../services/memberApi";
 
 interface FormType {
-  phone: string;
-  code: string;
+  mobile: string;
+  smsCode: string;
 }
+
+const randomCode = Math.floor(Math.random() * 10000).toString();
 
 // 登录页面
 const Register: React.FC = () => {
+  const [smsCodeTitle, setsmsCodeTitle] = useState<string>("获取验证码");
+
   const [formData, setFormData] = useState<FormType>({
-    phone: "",
-    code: ""
+    mobile: "",
+    smsCode: ""
   });
 
-  const disabled = formData.phone === "" || formData.code === "";
+  const disabled = formData.mobile === "" || formData.smsCode === "";
 
   useEffect(() => {
     // 获取用户openid，用于获取手机号（老板接口）
     // Taro.login({
     //   success: res => {
     //     console.log(res);
-    //     let appId = "wx00fa32a7c2c1a3e7";
-    //     let appSecret = "71f3927330a809fde2be894f0af6ed6a";
+    //     let appId = 'wx00fa32a7c2c1a3e7';
+    //     let appSecret = '71f3927330a809fde2be894f0af6ed6a';
     //     let url = `https://api.weixin.qq.com/sns/jscode2session?appid=${appId}&secret=${appSecret}&js_code=${res.code}&grant_type=authorization_code`;
     //     Taro.request({
-    //       method: "GET",
+    //       method: 'GET',
     //       url,
     //       success: res2 => {
     //         console.log(res2);
@@ -49,26 +56,61 @@ const Register: React.FC = () => {
     // });
   });
   // 提交表单
-  const handleSubmit: FormProps["onSubmit"] = e => {
-    const { phone, code } = e.detail.value as FormType;
-    if (phone === "") {
+  const handleSubmit: FormProps["onSubmit"] = async e => {
+    const { mobile, smsCode } = e.detail.value as FormType;
+    if (!isMobile(mobile)) {
       return Taro.showToast({
-        title: "请输入手机号码!",
+        title: "手机号格式不正确!",
         icon: "error"
       });
-    } else if (code === "") {
+    } else if (smsCode !== randomCode) {
       return Taro.showToast({
-        title: "请输入验证码!",
+        title: "验证码不正确!",
         icon: "error"
       });
     }
-    console.log(e);
+    const res = (await memberApi.reqLoginByMobile({
+      mobile,
+      smsCode
+    })) as API.ResultType & { member: API.MemberYype };
+    if (res.code === 0) {
+      // 存储会员信息
+      Taro.setStorageSync("memberInfo", res.member);
+      // 跳转至之前的页面
+      const pages = Taro.getCurrentPages();
+      if (pages.length >= 2) {
+        if (pages[pages.length - 2].route === "pages/register/register") {
+          return Taro.navigateBack({ delta: 2 });
+        }
+      }
+      return Taro.navigateBack();
+    } else {
+      return Taro.showToast({
+        title: res.msg,
+        icon: "error"
+      });
+    }
   };
 
-  const handleClick: EventProps["onClick"] = e => {
-    console.log(e);
+  // 获取验证码
+  const handelSendCode: EventProps["onClick"] = () => {
+    if (!formData.mobile) {
+      return;
+    }
+    if (!isMobile(formData.mobile)) {
+      return Taro.showToast({
+        title: "您的手机号格式不正确！",
+        icon: "error"
+      });
+    }
+    console.log(isMobile(formData.mobile));
+    return Taro.showToast({
+      title: "您的验证码为" + randomCode,
+      icon: "none"
+    });
   };
-  // 获取手机号
+
+  // 获取手机号//微信登录
   const getPhoneNumber: CommonEventFunction = e => {
     console.log(e);
     if (!e.detail.code) {
@@ -91,9 +133,16 @@ const Register: React.FC = () => {
     // })
   };
 
-  // 跳转至登录页面
+  // 跳转至密码登录页面
   const toLogin = () => {
-    Taro.redirectTo({
+    const pages = Taro.getCurrentPages();
+    console.log(pages);
+    if (pages.length >= 2) {
+      if (pages[pages.length - 2].route === "pages/login/login") {
+        return Taro.navigateBack();
+      }
+    }
+    return Taro.navigateTo({
       url: "/pages/login/login"
     });
   };
@@ -103,34 +152,42 @@ const Register: React.FC = () => {
       {/* 登陆表单 */}
       <Form onSubmit={handleSubmit} className={Style.loginForm}>
         <View className={Style.formItem}>
-          <Label for="phone">手机号：</Label>
+          <Label for="mobile">手机号：</Label>
           <Input
-            name="phone"
+            name="mobile"
             placeholder="请输入手机号码"
             type="number"
-            value={formData.phone}
-            onInput={e => setFormData({ ...formData, phone: e.detail.value })}
+            value={formData.mobile}
+            onInput={e => setFormData({ ...formData, mobile: e.detail.value })}
           ></Input>
           <Text
             className={"iconfont icon-clear1 " + Style.clearIconfont}
-            style={{ display: formData.phone === "" ? "none" : "" }}
-            onClick={() => setFormData({...formData,phone: ''})}
+            style={{ display: formData.mobile === "" ? "none" : "" }}
+            onClick={() => setFormData({ ...formData, mobile: "" })}
           ></Text>
-          <Text className={Style.handleText}>获取验证码</Text>
+          <Text
+            className={Style.handleText}
+            style={{
+              color: !formData.mobile ? "lightgray" : ""
+            }}
+            onClick={handelSendCode}
+          >
+            {smsCodeTitle}
+          </Text>
         </View>
         <View className={Style.formItem}>
-          <Label for="code">验证码：</Label>
+          <Label for="smsCode">验证码：</Label>
           <Input
-            name="code"
+            name="smsCode"
             placeholder="请输入验证码"
             type="number"
-            value={formData.code}
-            onInput={e => setFormData({ ...formData, code: e.detail.value })}
+            value={formData.smsCode}
+            onInput={e => setFormData({ ...formData, smsCode: e.detail.value })}
           ></Input>
           <Text
             className={"iconfont icon-clear1 " + Style.clearIconfont}
-            style={{ display: formData.code === "" ? "none" : "" }}
-            onClick={() => setFormData({...formData,code: ''})}
+            style={{ display: formData.smsCode === "" ? "none" : "" }}
+            onClick={() => setFormData({ ...formData, smsCode: "" })}
           ></Text>
         </View>
         <View className={Style.formItem}>

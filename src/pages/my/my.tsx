@@ -1,18 +1,35 @@
-import React, { useEffect } from 'react'
-import { View, Button, Text, Image } from '@tarojs/components'
+import React, { useEffect, useState } from 'react'
+import { View, Button, Text, Image, EventProps } from '@tarojs/components'
 
 import Style from './my.module.scss'
+import Taro from '@tarojs/taro'
 
 const My: React.FC = () => {
+  const [memberInfo, setMemberInfo] = useState<API.MemberYype>(Taro.getStorageSync('memberInfo'))
+
+  useEffect(()=>{
+    // const member = Taro.getStorageSync('memberInfo')
+    // if (member) {
+    //   console.log(member);
+    //   setMemberInfo(member)
+    // }
+  },[])
+
+  const toLogin:EventProps['onClick'] = () => {
+    Taro.navigateTo({
+      url: "/pages/register/register"
+    })
+  }
+
   return (
     <View className={Style.myContainer}>
       {/* 用户部分 */}
-      <View className={Style.userSection}>
+      <View className={Style.userSection} onClick={toLogin}>
         <View className={Style.userInfo}>
-          <Image className={Style.portrait} src='/assets/images/个人-selected.png' />
+          <Image className={Style.portrait} src={memberInfo?memberInfo.portrait?memberInfo.portrait:'../../assets/images/tabBar/个人-selected.png':'/assets/images/tabBar/个人-selected.png'} />
           <View>
-            <View>lk</View>
-            <View className={Style.UID}>UID:1220145515</View>
+            <View>{memberInfo?memberInfo.nickname:'点击登录'}</View>
+            {memberInfo?<View className={Style.UID}>UID:{memberInfo?.memberId}</View>:null}
           </View>
         </View>
         <View>

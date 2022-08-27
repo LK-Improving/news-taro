@@ -56,12 +56,12 @@
                     min-width: 300px;
                     margin: 0
                 }
-
-                .registerBtn {
+                
+                .LoginBtn {
                     @include activeBtn;
                 }
 
-                .LoginBtn {
+                .registerBtn {
                     @include defaultBtn;
                 }
             }

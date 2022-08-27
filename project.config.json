@@ -4,7 +4,7 @@
   "description": "新闻taro",
   "appid": "wx00fa32a7c2c1a3e7",
   "setting": {
-    "urlCheck": true,
+    "urlCheck": false,
     "es6": false,
     "enhance": false,
     "compileHotReLoad": false,

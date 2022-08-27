@@ -8,44 +8,61 @@ import {
   Button,
   FormProps,
   Image,
-  Text
+  Text,
+  CommonEventFunction
 } from "@tarojs/components";
 import Style from "./login.module.scss";
 import Taro from "@tarojs/taro";
 import phoneImg from "../../assets/images/login//phone.svg";
 import weixinImg from "../../assets/images/login/weixin.svg";
+import api from "../../services";
+import { isMobile } from "../../utils/validate";
+import useStore from "../../store";
 
 interface FormType {
-  account: string;
+  mobile: string;
   password: string;
 }
 
 // 登录页面
 const Login: React.FC = () => {
   const [formData, setFormData] = useState<FormType>({
-    account: "",
+    mobile: "",
     password: ""
   });
-  const disabled = formData.account === "" || formData.password === "";
+  const disabled = formData.mobile === "" || formData.password === "";
 
-  const handleSubmit: FormProps["onSubmit"] = e => {
-    const { account, password } = e.detail.value as FormType;
-    if (account === "") {
+  const { useMobxStore } = useStore();
+  const handleSubmit: FormProps["onSubmit"] = async e => {
+    const { mobile, password } = e.detail.value as FormType;
+    if (!isMobile(mobile)) {
       return Taro.showToast({
-        title: "请输入用户名!",
-        icon: "error"
-      });
-    } else if (password === "") {
-      return Taro.showToast({
-        title: "请输入密码!",
+        title: "手机号格式不正确!",
         icon: "error"
       });
     }
-    console.log(e);
-  };
-
-  const handleClick: EventProps["onClick"] = e => {
-    console.log(e);
+    const res = (await api.memberApi.reqLoginByPassword({
+      mobile,
+      password
+    })) as API.ResultType & { member: API.MemberYype };
+    console.log(res);
+    if (res.code === 0) {
+      // 存储会员信息
+      Taro.setStorageSync("memberInfo", res.member);
+      // 跳转至之前的页面
+      const pages = Taro.getCurrentPages();
+      if (pages.length >= 2) {
+        if (pages[pages.length - 2].route === "pages/register/register") {
+          return Taro.navigateBack({ delta: 2 });
+        }
+      }
+      return Taro.navigateBack();
+    } else {
+      return Taro.showToast({
+        title: res.msg,
+        icon: "error"
+      });
+    }
   };
 
   // 获取手机号
@@ -73,7 +90,13 @@ const Login: React.FC = () => {
 
   // 跳转至手机号登录注册页面
   const toRegister = () => {
-    Taro.redirectTo({
+    const pages = Taro.getCurrentPages();
+    if (pages.length >= 2) {
+      if (pages[pages.length - 2].route === "pages/register/register") {
+        return Taro.navigateBack();
+      }
+    }
+    return Taro.navigateTo({
       url: "/pages/register/register"
     });
   };
@@ -83,17 +106,17 @@ const Login: React.FC = () => {
       {/* 登陆表单 */}
       <Form onSubmit={handleSubmit} className={Style.loginForm}>
         <View className={Style.formItem}>
-          <Label for="account">用户名：</Label>
+          <Label for="mobile">用户名：</Label>
           <Input
-            name="account"
+            name="mobile"
             placeholder="请输入用户名"
-            value={formData.account}
-            onInput={e => setFormData({ ...formData, account: e.detail.value })}
+            value={formData.mobile}
+            onInput={e => setFormData({ ...formData, mobile: e.detail.value })}
           ></Input>
           <Text
             className={"iconfont icon-clear1 " + Style.clearIconfont}
-            style={{ display: formData.account === "" ? "none" : "" }}
-            onClick={() => setFormData({ ...formData, account: "" })}
+            style={{ display: formData.mobile === "" ? "none" : "" }}
+            onClick={() => setFormData({ ...formData, mobile: "" })}
           ></Text>
         </View>
         <View className={Style.formItem}>
@@ -128,11 +151,11 @@ const Login: React.FC = () => {
         </View>
         <View className={Style.formItem}>
           <View className={Style.buttonGroup}>
-            <Button className={Style.LoginBtn} formType="reset">
-              重置
+            <Button className={Style.registerBtn} onClick={toRegister}>
+              注册
             </Button>
             <Button
-              className={Style.registerBtn}
+              className={Style.LoginBtn}
               disabled={disabled}
               formType="submit"
               style={{
@@ -140,7 +163,7 @@ const Login: React.FC = () => {
                 color: disabled ? "#f6dfe1" : ""
               }}
             >
-              登录
+              登录{useMobxStore.count}
             </Button>
           </View>
         </View>
