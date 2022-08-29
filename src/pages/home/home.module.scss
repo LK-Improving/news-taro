@@ -47,41 +47,95 @@
         }
     }
 
-    .contentScroll {
+    .articleScroll {
         height: calc(100vh - 150px);
+        background: #f2eeee;
 
-        .contentItem {
-            height: 180px;
+        .articleItem {
             padding: 20px 0;
             display: flex;
-            border-bottom: 1px solid #d7d7d7;
+            flex-direction: column;
+            margin-bottom: 20px;
+            background: white;
+
+            &:first-child {
+                margin-top: 20px;
+            }
+            .item{
+                margin: 20px 0;
+            }
+            .header {
+                display: flex;
+                align-items: center;
+
+                .portrait {
+                    width: 60px;
+                    height: 60px;
+                    border-radius: 60px;
+                }
+
+                .nickNmae {
+                    font-size: 32px;
+                }
+
+                .publishTime {
+                    color: #9d9d9d;
+                    font-size: 24px;
+                }
+
+                .right {
+                    float: right;
+                    margin-left: auto;
+
+                    button {
+                        font-size: 32px;
+                        height: 60px;
+                        line-height: 60px;
+                        border-radius: 5px;
+                        @include defaultBtn
+                    }
+                }
+            }
 
             .content {
                 flex: 1;
 
                 .title {
                     //多行文本溢出隐藏用...代替
-                    height: 150px;
+                    font-size: 36px;
                     overflow: hidden;
                     text-overflow: ellipsis;
                     line-height: 50px;
                     display: -webkit-box;
                     -webkit-box-orient: vertical; // 设置对齐模式：垂直
-                    -webkit-line-clamp: 3;
+                    -webkit-line-clamp: 2;
                 }
 
-                .detail {
-                    line-height: 30px;
-                    font-size: 30px;
-                    color: #9d9d9d;
-                    display: flex;
-                    justify-content: space-between;
+
+            }
+
+            .cover {
+                display: flex;
+                // justify-content: space-between;
+                flex-wrap: nowrap;
+                // overflow: hidden;
+                .contentImage {
+                    // width: 50vw;
+                    max-height: 250px;
+                    margin-right: 1vw;
+                    &:last-child{
+                        margin-right: 0;
+                    }
                 }
             }
 
-            .contentImage {
-                width: 200px;
-                height: 180px;
+
+            .detail {
+                line-height: 30px;
+                font-size: 30px;
+                color: #9d9d9d;
+                display: flex;
+                justify-content: space-between;
             }
         }
     }

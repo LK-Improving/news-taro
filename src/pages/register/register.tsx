@@ -3,7 +3,7 @@ import {
   View,
   EventProps,
   Form,
-  Label,
+  Label, 
   Input,
   Button,
   FormProps,
@@ -11,13 +11,13 @@ import {
   Image,
   CommonEventFunction
 } from "@tarojs/components";
-import Style from "./register.module.scss";
-// eslint-disable-next-line import/first
 import Taro from "@tarojs/taro";
+import Style from "./register.module.scss";
 import lockImg from "../../assets/images/login/lock.svg";
 import weixinImg from "../../assets/images/login/weixin.svg";
 import { isMobile } from "../..//utils/validate";
-import memberApi from "../../services/memberApi";
+import memberApi from "../../services/api/memberApi";
+import useStore from "../../store";
 
 interface FormType {
   mobile: string;
@@ -36,6 +36,8 @@ const Register: React.FC = () => {
   });
 
   const disabled = formData.mobile === "" || formData.smsCode === "";
+
+  const { MemberStore } = useStore();
 
   useEffect(() => {
     // 获取用户openid，用于获取手机号（老板接口）
@@ -76,6 +78,7 @@ const Register: React.FC = () => {
     if (res.code === 0) {
       // 存储会员信息
       Taro.setStorageSync("memberInfo", res.member);
+      MemberStore.serMmberInfo(res.member);
       // 跳转至之前的页面
       const pages = Taro.getCurrentPages();
       if (pages.length >= 2) {

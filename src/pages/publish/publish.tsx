@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View, Editor, Text, Textarea, Block, Image, Button } from "@tarojs/components";
-import content2 from "./content";
+import Taro,{ getCurrentInstance } from "@tarojs/taro";
+// import content2 from "./content";
 import Style from "./publish.module.scss";
-import { ComponentInstance, getCurrentInstance } from "@tarojs/taro";
-import Taro from "@tarojs/taro";
+
 
 interface CtxType {
   clear?: Function;

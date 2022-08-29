@@ -11,11 +11,11 @@ import {
   Text,
   CommonEventFunction
 } from "@tarojs/components";
-import Style from "./login.module.scss";
 import Taro from "@tarojs/taro";
+import Style from "./login.module.scss";
 import phoneImg from "../../assets/images/login//phone.svg";
 import weixinImg from "../../assets/images/login/weixin.svg";
-import api from "../../services";
+import memberApi from "../../services/api/memberApi";
 import { isMobile } from "../../utils/validate";
 import useStore from "../../store";
 
@@ -32,7 +32,7 @@ const Login: React.FC = () => {
   });
   const disabled = formData.mobile === "" || formData.password === "";
 
-  const { useMobxStore } = useStore();
+  const { MemberStore } = useStore();
   const handleSubmit: FormProps["onSubmit"] = async e => {
     const { mobile, password } = e.detail.value as FormType;
     if (!isMobile(mobile)) {
@@ -41,7 +41,7 @@ const Login: React.FC = () => {
         icon: "error"
       });
     }
-    const res = (await api.memberApi.reqLoginByPassword({
+    const res = (await memberApi.reqLoginByPassword({
       mobile,
       password
     })) as API.ResultType & { member: API.MemberYype };
@@ -49,6 +49,7 @@ const Login: React.FC = () => {
     if (res.code === 0) {
       // 存储会员信息
       Taro.setStorageSync("memberInfo", res.member);
+      MemberStore.serMmberInfo(res.member)
       // 跳转至之前的页面
       const pages = Taro.getCurrentPages();
       if (pages.length >= 2) {
@@ -163,7 +164,7 @@ const Login: React.FC = () => {
                 color: disabled ? "#f6dfe1" : ""
               }}
             >
-              登录{useMobxStore.count}
+              登录
             </Button>
           </View>
         </View>

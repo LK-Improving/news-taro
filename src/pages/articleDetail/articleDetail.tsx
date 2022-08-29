@@ -10,11 +10,12 @@ import {
   Block,
   Textarea
 } from "@tarojs/components";
+import { getCurrentInstance, useShareAppMessage } from "@tarojs/taro";
 
 import Style from "./articleDetail.module.scss";
 
 import arcImag from "../../assets/images/arc.png";
-import { useShareAppMessage } from "@tarojs/taro";
+
 
 interface UserType {
   nickName: string;
@@ -50,7 +51,8 @@ const ArticleDetail: React.FC = (props) => {
     publishTime: "六天前",
     commonList: []
   });
-
+  // 获取页面实例
+  const instance = getCurrentInstance()
   // 评论
   const [common, setCommon] = useState<string>("");
 
@@ -78,7 +80,7 @@ const ArticleDetail: React.FC = (props) => {
 
 
   useEffect(()=>{
-    console.log(props);
+    console.log(instance.router?.params);
     
   })
 
