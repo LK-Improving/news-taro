@@ -44,8 +44,8 @@ declare namespace API {
     content: string;
     coverList: CoverType[];
     createTime: string;
-    isAudit: string;
-    member: MemberYype;
+    isAudit: number;
+    member: Partial<MemberYype>;
     publishTime: string;
     readCount: number;
     tag: string[] | null;

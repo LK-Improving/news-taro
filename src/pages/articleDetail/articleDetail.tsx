@@ -15,44 +15,35 @@ import { getCurrentInstance, useShareAppMessage } from "@tarojs/taro";
 import Style from "./articleDetail.module.scss";
 
 import arcImag from "../../assets/images/arc.png";
+import articleApi from "../../services/api/articleApi";
 
-
-interface UserType {
-  nickName: string;
-  portrait: string;
-}
-
-type ArticleType = {
-  userInfo: UserType;
-  readCount: Number;
-  title: string;
-  content: string;
-  city: string;
-  like: number;
-  collectionNum: number;
-  cover: string;
-  publishTime: string;
-  commonList: Array<UserType & { common: string }>;
-};
-
-const ArticleDetail: React.FC = (props) => {
-  const [articleDetail, setArticleDetail] = useState<ArticleType>({
-    userInfo: {
-      nickName: "admin",
-      portrait: "/assets/images/tabBar/个人-selected.png"
-    },
-    readCount: 145154,
-    title: "text",
-    content: require("../publish/content"),
-    city: "湖南",
-    like: 515452,
-    collectionNum: 151545,
-    cover: require("../../assets/images/bgImg.jpg"),
-    publishTime: "六天前",
-    commonList: []
+const ArticleDetail: React.FC = () => {
+  const [articleDetail, setArticleDetail] = useState<Partial<API.ArticleType>>({
+    articleId: 1741828224670735,
+    authorId: 1563343744953057300,
+    catName: "财经",
+    content: "",
+    coverList: [
+      {
+        articleId: 1741828224670735,
+        defaultImg: 0,
+        id: 461,
+        imgName: "tos-cn-i-qvj2lq49k0/93557ac3c735433d965bb6ef25919442",
+        imgSort: 0,
+        imgUrl: "http://p3-sign.toutiaoimg.com/tos-cn-i-qvj2lq49k0/93557ac3c735433d965bb6ef25919442~tplv-tt-post:400:400.jpeg?from=post&x-expires=1668960000&x-signature=g5STBTwDRQVjSPs0cFm7p305%2F7c%3D"
+      }
+    ],
+    createTime: "2022-08-22 10:56:20",
+    isAudit: 1,
+    member: {},
+    publishTime: "2022-08-22 10:56:20",
+    readCount: 12058406,
+    tag: null,
+    title: "",
+    userId: 1
   });
   // 获取页面实例
-  const instance = getCurrentInstance()
+  const instance = getCurrentInstance();
   // 评论
   const [common, setCommon] = useState<string>("");
 
@@ -78,11 +69,23 @@ const ArticleDetail: React.FC = (props) => {
 
   const showConfirmBar = false;
 
+  useEffect(() => {
+    console.log(instance.router?.params.articleId);
+    init();
+  }, []);
 
-  useEffect(()=>{
-    console.log(instance.router?.params);
-    
-  })
+  const init = async () => {
+    const articleId = instance.router?.params.articleId as string;
+    const res = (await articleApi.reqArticleInfo(
+      articleId
+    )) as API.ResultType & {
+      article: API.ArticleType;
+    };
+    if (res && res.code === 0) {
+      console.log(res);
+      setArticleDetail(res.article);
+    }
+  };
 
   // 手指触摸开始操作
   const handleTouchStart: EventProps["onTouchStart"] = e => {
@@ -139,7 +142,7 @@ const ArticleDetail: React.FC = (props) => {
       {/* 封面 */}
       <Swiper className={Style.coverSwiper}>
         <SwiperItem>
-          <Image src={articleDetail.cover}></Image>
+          <Image src={articleDetail.coverList[0].imgUrl}></Image>
         </SwiperItem>
         <SwiperItem>
           <Image src={articleDetail.cover}></Image>
@@ -157,10 +160,10 @@ const ArticleDetail: React.FC = (props) => {
           <Image className={Style.arc} src={arcImag}></Image>
           <View className={Style.title}>{articleDetail.title}</View>
           <View className={Style.detail}>
-            <Image src={articleDetail.userInfo.portrait} />
+            <Image src={articleDetail.member.portrait} />
             <View className={Style.infoSection}>
               <View className={Style.author}>
-                {articleDetail.userInfo.nickName}
+                {articleDetail.member.nickname}
               </View>
               <View className={Style.info}>
                 <Text style={{ marginRight: 20 }}>
@@ -187,12 +190,12 @@ const ArticleDetail: React.FC = (props) => {
         {/* 点赞，收藏，转发， */}
         <View className={Style.artcileFooter}>
           <View className={Style.footerLeft}>
-            评论&nbsp;{articleDetail.commonList.length}
+            {/* 评论&nbsp;{articleDetail.commonList.length} */}
           </View>
           <View className={Style.FooterRight}>
-            <View>{articleDetail.like}&nbsp;赞</View>
+            {/* <View>{articleDetail.like}&nbsp;赞</View> */}
             <View>&nbsp;|&nbsp;</View>
-            <View>{articleDetail.collectionNum}&nbsp;收藏</View>
+            {/* <View>{articleDetail.collectionNum}&nbsp;收藏</View> */}
           </View>
         </View>
       </View>
