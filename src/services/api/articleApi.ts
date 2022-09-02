@@ -1,4 +1,4 @@
-import { get } from "../../utils/request";
+import { get, post } from "../../utils/request";
 
 const prefix = "/article";
 
@@ -8,5 +8,6 @@ export default {
   // 根据分类获取所有文章
   reqArticleListByCatId: (params: object) => get(prefix + "/list", params),
   // 文章详情
-  reqArticleInfo: (value: string) => get(prefix + "/info/" + value)
+  reqArticleInfo: (value: string) => get(prefix + "/info/" + value),
+
 };

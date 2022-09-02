@@ -10,12 +10,15 @@ import {
   Block,
   Textarea
 } from "@tarojs/components";
-import { getCurrentInstance, useShareAppMessage } from "@tarojs/taro";
-
+import Taro, { getCurrentInstance, useShareAppMessage } from "@tarojs/taro";
+import { observer } from "mobx-react-lite";
 import Style from "./articleDetail.module.scss";
 
 import arcImag from "../../assets/images/arc.png";
 import articleApi from "../../services/api/articleApi";
+import memberApi from "../../services/api/memberApi";
+import useStore from "../../store";
+
 
 const ArticleDetail: React.FC = () => {
   const [articleDetail, setArticleDetail] = useState<Partial<API.ArticleType>>({
@@ -30,7 +33,8 @@ const ArticleDetail: React.FC = () => {
         id: 461,
         imgName: "tos-cn-i-qvj2lq49k0/93557ac3c735433d965bb6ef25919442",
         imgSort: 0,
-        imgUrl: "http://p3-sign.toutiaoimg.com/tos-cn-i-qvj2lq49k0/93557ac3c735433d965bb6ef25919442~tplv-tt-post:400:400.jpeg?from=post&x-expires=1668960000&x-signature=g5STBTwDRQVjSPs0cFm7p305%2F7c%3D"
+        imgUrl:
+          "http://p3-sign.toutiaoimg.com/tos-cn-i-qvj2lq49k0/93557ac3c735433d965bb6ef25919442~tplv-tt-post:400:400.jpeg?from=post&x-expires=1668960000&x-signature=g5STBTwDRQVjSPs0cFm7p305%2F7c%3D"
       }
     ],
     createTime: "2022-08-22 10:56:20",
@@ -40,12 +44,18 @@ const ArticleDetail: React.FC = () => {
     readCount: 12058406,
     tag: null,
     title: "",
-    userId: 1
+    userId: 1,
+    likeCount: 0,
+    collectionCount: 0,
+    commentCount: 0
   });
   // 获取页面实例
   const instance = getCurrentInstance();
   // 评论
-  const [common, setCommon] = useState<string>("");
+  const [comment, setComment] = useState<string>("");
+
+  // 评论列表
+  const [commenList, setCommentList] = useState<[]>([]);
 
   // 键盘高度
   const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
@@ -62,6 +72,8 @@ const ArticleDetail: React.FC = () => {
   const [coverTransform, setCoverTransForm] = useState<string>("");
 
   const [coverTransition, setCoverTransiton] = useState<string>("");
+
+  const { MemberStore } = useStore();
 
   let startY = 0; // 手指起始的坐标
   let moveY = 0; // 手指移动的坐标
@@ -84,6 +96,11 @@ const ArticleDetail: React.FC = () => {
     if (res && res.code === 0) {
       console.log(res);
       setArticleDetail(res.article);
+      const res2 = await memberApi.reqCommentListByArticleId(res.article.articleId)
+      if (res2 && res2.code === 0) {
+        console.log(res2);
+        
+      }
     }
   };
 
@@ -137,20 +154,40 @@ const ArticleDetail: React.FC = () => {
     };
   });
 
+  // 评论
+  const handleComment: EventProps["onClick"] = async () => {
+    console.log(comment);
+    const params = {
+      articleId: articleDetail.articleId,
+      memberId: MemberStore.memberInfo.memberId,
+      content: comment
+    };
+    const res = await memberApi.reqSaveComment(params);
+    if (res && res.code === 0) {
+      console.log(res);
+      Taro.showToast({
+        icon: 'success',
+        title: '评论成功'
+      })
+    }
+  };
   return (
     <View className={Style.articleDetailContainer}>
       {/* 封面 */}
       <Swiper className={Style.coverSwiper}>
-        <SwiperItem>
-          <Image src={articleDetail.coverList[0].imgUrl}></Image>
-        </SwiperItem>
-        <SwiperItem>
-          <Image src={articleDetail.cover}></Image>
-        </SwiperItem>
+        {articleDetail.coverList!.length > 0
+          ? articleDetail.coverList!.map((item, index) => {
+              return (
+                <SwiperItem key={item.id}>
+                  <Image src={articleDetail.coverList![index].imgUrl}></Image>
+                </SwiperItem>
+              );
+            })
+          : null}
       </Swiper>
       {/* 文章详情 */}
       <View style={{ transform: coverTransform, transition: coverTransition }}>
-        {/* 文章头部 */}
+        {/* 头部 */}
         <View
           className={Style.artcileHeader}
           onTouchStart={handleTouchStart}
@@ -160,16 +197,16 @@ const ArticleDetail: React.FC = () => {
           <Image className={Style.arc} src={arcImag}></Image>
           <View className={Style.title}>{articleDetail.title}</View>
           <View className={Style.detail}>
-            <Image src={articleDetail.member.portrait} />
+            <Image src={articleDetail.member!.portrait!} />
             <View className={Style.infoSection}>
               <View className={Style.author}>
-                {articleDetail.member.nickname}
+                {articleDetail.member!.nickname}
               </View>
               <View className={Style.info}>
                 <Text style={{ marginRight: 20 }}>
                   {articleDetail.publishTime}
                 </Text>
-                {"来自" + articleDetail.city}
+                {/* {'来自' + articleDetail.city} */}
               </View>
             </View>
             <Button>关注</Button>
@@ -181,7 +218,6 @@ const ArticleDetail: React.FC = () => {
             id="article"
             containerStyle="padding:0px;"
             content={articleDetail.content}
-            placeholder="请输入正文"
             emoji
             domain="https://mp-html.oss-cn-hangzhou.aliyuncs.com"
           />
@@ -190,29 +226,55 @@ const ArticleDetail: React.FC = () => {
         {/* 点赞，收藏，转发， */}
         <View className={Style.artcileFooter}>
           <View className={Style.footerLeft}>
-            {/* 评论&nbsp;{articleDetail.commonList.length} */}
+            评论&nbsp;{articleDetail.commentCount}
           </View>
           <View className={Style.FooterRight}>
-            {/* <View>{articleDetail.like}&nbsp;赞</View> */}
+            <View>{articleDetail.likeCount}&nbsp;赞</View>
             <View>&nbsp;|&nbsp;</View>
-            {/* <View>{articleDetail.collectionNum}&nbsp;收藏</View> */}
+            <View>{articleDetail.collectionCount}&nbsp;收藏</View>
           </View>
         </View>
       </View>
-
+      {/* 评论 */}
+      <View className={Style.CommntList}>
+        <View className={Style.commentItem}>
+          {/* 文章头部 */}
+          <View className={Style.artcileHeader}>
+            <View className={Style.detail}>
+              <Image src={articleDetail.member!.portrait!} />
+              <View className={Style.infoSection}>
+                <View className={Style.author}>
+                  {articleDetail.member!.nickname}
+                </View>
+                <View className={Style.info}>
+                  <Text style={{ marginRight: 20 }}>
+                    {articleDetail.publishTime}
+                  </Text>
+                  {/* {'来自' + articleDetail.city} */}
+                </View>
+              </View>
+            </View>
+          </View>
+          sdsadfa
+        </View>
+      </View>
       {/* 操作栏 */}
       <View
         className={Style.handleBar}
-        // style={{ bottom: keyboardHeight + "rpx" }}
+        // style={{ bottom: keyboardHeight + 'rpx' }}
       >
         {!visible ? (
           <Block>
-            <View className={Style.white} onClick={() => setVisible(true)}>
+            <View className={Style.white} onClick={() => MemberStore.memberInfo?setVisible(true):null}>
               <Text
                 className="iconfont icon-shuru"
                 style={{ fontSize: "32rpx" }}
               ></Text>
-              <Text>&nbsp;写评论···</Text>
+              {MemberStore.memberInfo ? (
+                <Text>&nbsp;写评论···</Text>
+              ) : (
+                <Text>&nbsp;登陆后才能评论</Text>
+              )}
             </View>
             <Button onClick={handleLike}>
               <Text
@@ -252,25 +314,25 @@ const ArticleDetail: React.FC = () => {
               placeholder="发个友善的评论吧！"
               placeholderStyle="color: #868080;"
               fixed
-              value={common}
-              onInput={e => setCommon(e.detail.value)}
+              value={comment}
+              onInput={e => setComment(e.detail.value)}
               autoFocus
               autoHeight
               showConfirmBar={showConfirmBar}
               adjustPosition={false}
+              maxlength={120}
               onFocus={e => {
-                console.log(e);
                 setKeyboardHeight(8);
               }}
               onBlur={e => {
-                console.log(e);
                 setKeyboardHeight(0);
                 setVisible(false);
               }}
             ></Textarea>
             <Text
               className={Style.publish}
-              style={{ color: common ? "#e98e97" : "#868080" }}
+              style={{ color: comment ? "#e98e97" : "#868080" }}
+              onClick={handleComment}
             >
               发布
             </Text>
@@ -281,4 +343,4 @@ const ArticleDetail: React.FC = () => {
   );
 };
 
-export default ArticleDetail;
+export default observer(ArticleDetail);

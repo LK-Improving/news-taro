@@ -12,7 +12,7 @@ declare namespace API {
     createTime: string;
     expiresIn: string;
     gender: string;
-    memberId: number;
+    memberId: string;
     mobile: string;
     nickname: string;
     password: string;
@@ -51,6 +51,9 @@ declare namespace API {
     tag: string[] | null;
     title: string;
     userId: number;
+    likeCount: number;
+    collectionCount: number;
+    commentCount: number
   }
   interface PageType {
     currPage: number;

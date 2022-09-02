@@ -4,7 +4,6 @@ import Taro from "@tarojs/taro";
 import { observer } from "mobx-react-lite";
 import Style from "./my.module.scss";
 import useStore from "../../store";
-import MemberStore from "src/store/modules/member";
 
 const My: React.FC = () => {
   const {
