@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Button,
@@ -8,7 +8,9 @@ import {
   SwiperItem,
   EventProps,
   Block,
-  Textarea
+  Textarea,
+  ScrollView,
+  ScrollViewProps
 } from "@tarojs/components";
 import Taro, { getCurrentInstance, useShareAppMessage } from "@tarojs/taro";
 import { observer } from "mobx-react-lite";
@@ -18,9 +20,10 @@ import arcImag from "../../assets/images/arc.png";
 import articleApi from "../../services/api/articleApi";
 import memberApi from "../../services/api/memberApi";
 import useStore from "../../store";
-
+import { debounce } from "../..//utils";
 
 const ArticleDetail: React.FC = () => {
+  // 文章详情
   const [articleDetail, setArticleDetail] = useState<Partial<API.ArticleType>>({
     articleId: 1741828224670735,
     authorId: 1563343744953057300,
@@ -55,7 +58,7 @@ const ArticleDetail: React.FC = () => {
   const [comment, setComment] = useState<string>("");
 
   // 评论列表
-  const [commenList, setCommentList] = useState<[]>([]);
+  const [commenList, setCommentList] = useState<API.commentType[]>([]);
 
   // 键盘高度
   const [keyboardHeight, setKeyboardHeight] = useState<number>(0);
@@ -69,9 +72,28 @@ const ArticleDetail: React.FC = () => {
   // 是否收藏
   const [isCollection, setIsCollection] = useState<boolean>(false);
 
+  // 变换
   const [coverTransform, setCoverTransForm] = useState<string>("");
 
+  // 变换配置
   const [coverTransition, setCoverTransiton] = useState<string>("");
+
+  // 当前页码
+  const [page, setPage] = useState<number>(1);
+
+  // 节流
+  const [isThrottle, setIsThrottle] = useState<boolean>(false);
+
+  // 总页数
+  const [totalPage, setTotalPage] = useState<number>(1);
+
+  // 状态Ref(解决卸载组件时状态不是最新的)
+  const stateRef = useRef({
+    likeState: false,
+    collectionState: false,
+    firstLikeState: false,
+    firstCollectionState: false
+  });
 
   const { MemberStore } = useStore();
 
@@ -81,27 +103,120 @@ const ArticleDetail: React.FC = () => {
 
   const showConfirmBar = false;
 
+  const articleId = instance.router?.params.articleId!;
+
+  // 初始化
   useEffect(() => {
-    console.log(instance.router?.params.articleId);
     init();
+    // 即将卸载
+    return () => {
+      console.log("即将卸载");
+      const {likeState,collectionState,firstLikeState,firstCollectionState} = stateRef!.current
+      console.log(likeState,firstLikeState);
+      console.log(collectionState,firstCollectionState);
+      if (likeState !== firstLikeState) {
+        isLikeArticle()
+      } 
+      if (collectionState !== firstCollectionState) {
+        isCollectionArticle()
+      }
+    };
   }, []);
 
+  // 监听页码
+  useEffect(() => {
+    if (page > 1) {
+      push();
+      setIsThrottle(false);
+    }
+  }, [page]);
+
+  // 监听是否点赞
+  useEffect(() => {
+    stateRef.current.likeState = isLike;
+  }, [isLike]);
+
+  // 监听受否收藏
+  useEffect(() => {
+    stateRef.current.collectionState = isCollection;
+  }, [isCollection]);
+
+  // 查询当前用户是否点赞该文章
+  const queryIsLike = async (params: object) => {
+    const res = (await memberApi.reqisLike(params)) as API.ResultType & {
+      isLike: boolean;
+    };
+    if (res && res.code === 0) {
+      console.log(res);
+      setIsLike(res.isLike);
+      stateRef.current.firstLikeState = res.isLike;
+    }
+  };
+
+  // 查询当前用户是否收藏该文章
+  const queryIsCollection = async (params: object) => {
+    const res = (await memberApi.reqIsCollection(params)) as API.ResultType & {
+      isCollection: boolean;
+    };
+    if (res && res.code === 0) {
+      console.log(res);
+      setIsCollection(res.isCollection);
+      stateRef.current.firstCollectionState = res.isCollection;
+    }
+  };
+
+  // 初始化
   const init = async () => {
-    const articleId = instance.router?.params.articleId as string;
+    getArticleDetail();
+    const res = await getCommentList();
+    setCommentList(res.list);
+    setTotalPage(res.totalPage);
+    if (MemberStore.memberInfo.memberId) {
+      const params = {
+        articleId,
+        memberId: MemberStore.memberInfo.memberId
+      };
+      queryIsLike(params);
+      queryIsCollection(params);
+    }
+  };
+
+  // 合并评论
+  const push = async () => {
+    const res = await getCommentList();
+    setCommentList(commenList.concat(res.list));
+  };
+
+  //获取文章详情
+  const getArticleDetail = async () => {
     const res = (await articleApi.reqArticleInfo(
       articleId
     )) as API.ResultType & {
       article: API.ArticleType;
     };
     if (res && res.code === 0) {
-      console.log(res);
       setArticleDetail(res.article);
-      const res2 = await memberApi.reqCommentListByArticleId(res.article.articleId)
-      if (res2 && res2.code === 0) {
-        console.log(res2);
-        
-      }
     }
+  };
+
+  // 获取评论
+  const getCommentList = async (): Promise<API.PageType & {
+    list: API.commentType[];
+  }> => {
+    const params = {
+      page,
+      limit: 10,
+      articleId
+    };
+    const res = (await memberApi.reqCommentListByArticleId(
+      params
+    )) as API.ResultType & {
+      page: API.PageType & { list: API.commentType[] };
+    };
+    if (res && res.code === 0) {
+      return Promise.resolve(res.page);
+    }
+    return Promise.reject(res.msg);
   };
 
   // 手指触摸开始操作
@@ -140,6 +255,11 @@ const ArticleDetail: React.FC = () => {
   // 收藏/取消收藏
   const handleCollection: EventProps["onClick"] = () => {
     setIsCollection(!isCollection);
+    if (!isCollection) {
+      Taro.showToast({
+        title: "收藏成功！"
+      });
+    }
   };
 
   // 分享
@@ -154,23 +274,60 @@ const ArticleDetail: React.FC = () => {
     };
   });
 
+  // 是否点赞
+  const isLikeArticle = () => {
+    const params = {
+      articleId,
+      memberId: MemberStore.memberInfo.memberId
+    };
+    if (stateRef.current.likeState) {
+      memberApi.reqSaveLike(params);
+    } else{
+      memberApi.reqDelLike(params)
+    }
+  };
+
+  // 是否收藏
+  const isCollectionArticle = () => {
+    const params = {
+      articleId,
+      memberId: MemberStore.memberInfo.memberId
+    };
+    if (stateRef.current.collectionState) {
+      memberApi.reqSaveCollection(params);
+    } else{
+      memberApi.reqDelCollection(params)
+    }
+  };
   // 评论
   const handleComment: EventProps["onClick"] = async () => {
     console.log(comment);
     const params = {
-      articleId: articleDetail.articleId,
+      articleId,
       memberId: MemberStore.memberInfo.memberId,
       content: comment
     };
     const res = await memberApi.reqSaveComment(params);
     if (res && res.code === 0) {
-      console.log(res);
       Taro.showToast({
-        icon: 'success',
-        title: '评论成功'
-      })
+        icon: "success",
+        title: "评论成功",
+        success: getCommentList
+      });
     }
   };
+  // 滚动至评论底部添加下一页评论
+  const handleScrollToLower: ScrollViewProps["onScrollToLower"] = () => {
+    let currentPAge = page;
+    if (currentPAge === totalPage || isThrottle) {
+      return;
+    }
+    setIsThrottle(true);
+    setTimeout(() => {
+      setPage(currentPAge + 1);
+    }, 1500);
+  };
+
   return (
     <View className={Style.articleDetailContainer}>
       {/* 封面 */}
@@ -185,6 +342,7 @@ const ArticleDetail: React.FC = () => {
             })
           : null}
       </Swiper>
+
       {/* 文章详情 */}
       <View style={{ transform: coverTransform, transition: coverTransition }}>
         {/* 头部 */}
@@ -228,36 +386,49 @@ const ArticleDetail: React.FC = () => {
           <View className={Style.footerLeft}>
             评论&nbsp;{articleDetail.commentCount}
           </View>
-          <View className={Style.FooterRight}>
+          <View className={Style.footerRight}>
             <View>{articleDetail.likeCount}&nbsp;赞</View>
             <View>&nbsp;|&nbsp;</View>
             <View>{articleDetail.collectionCount}&nbsp;收藏</View>
           </View>
         </View>
       </View>
+
       {/* 评论 */}
-      <View className={Style.CommntList}>
-        <View className={Style.commentItem}>
-          {/* 文章头部 */}
-          <View className={Style.artcileHeader}>
-            <View className={Style.detail}>
-              <Image src={articleDetail.member!.portrait!} />
-              <View className={Style.infoSection}>
-                <View className={Style.author}>
-                  {articleDetail.member!.nickname}
-                </View>
-                <View className={Style.info}>
-                  <Text style={{ marginRight: 20 }}>
-                    {articleDetail.publishTime}
-                  </Text>
-                  {/* {'来自' + articleDetail.city} */}
+      {commenList.length > 0 ? (
+        <ScrollView
+          className={Style.commentScroll}
+          scrollY
+          scrollWithAnimation
+          enableFlex
+          enable-passive
+          lower-threshold={150}
+          onScrollToLower={handleScrollToLower}
+        >
+          {commenList.map(item => {
+            return (
+              <View className={Style.commentItem} key={item.commentId}>
+                {/* 评论头部 */}
+                <View className={Style.commentHeader}>
+                  {/* 头像 */}
+                  <Image src={item.member.portrait} />
+                  <View className={Style.commentInfo}>
+                    <View className={Style.nickName}>
+                      {item.member.nickname}
+                    </View>
+                    <View className={Style.commentTime}>{item.createTime}</View>
+                    <View className={Style.commenContent}>{item.content}</View>
+                  </View>
                 </View>
               </View>
-            </View>
-          </View>
-          sdsadfa
-        </View>
-      </View>
+            );
+          })}
+          <View>{isThrottle ? "正在加载中！" : null}</View>
+          <View>{page === totalPage ? "没有更多啦！" : null}</View>
+        </ScrollView>
+      ) : (
+        <View>暂无评论</View>
+      )}
       {/* 操作栏 */}
       <View
         className={Style.handleBar}
@@ -265,7 +436,10 @@ const ArticleDetail: React.FC = () => {
       >
         {!visible ? (
           <Block>
-            <View className={Style.white} onClick={() => MemberStore.memberInfo?setVisible(true):null}>
+            <View
+              className={Style.white}
+              onClick={() => (MemberStore.memberInfo ? setVisible(true) : null)}
+            >
               <Text
                 className="iconfont icon-shuru"
                 style={{ fontSize: "32rpx" }}
@@ -276,7 +450,7 @@ const ArticleDetail: React.FC = () => {
                 <Text>&nbsp;登陆后才能评论</Text>
               )}
             </View>
-            <Button onClick={handleLike}>
+            <Button onClick={debounce(handleLike, 500)}>
               <Text
                 className={
                   isLike
@@ -284,11 +458,10 @@ const ArticleDetail: React.FC = () => {
                     : "iconfont icon-dianzan " + Style.handleOption
                 }
                 style={{ color: isLike ? "#e98e97" : "" }}
-                onClick={handleLike}
               ></Text>
             </Button>
 
-            <Button onClick={handleCollection}>
+            <Button onClick={debounce(handleCollection, 500)}>
               <Text
                 className={
                   isCollection
@@ -296,7 +469,6 @@ const ArticleDetail: React.FC = () => {
                     : "iconfont icon-shoucang " + Style.handleOption
                 }
                 style={{ color: isCollection ? "#e98e97" : "" }}
-                onClick={handleCollection}
               ></Text>
             </Button>
 

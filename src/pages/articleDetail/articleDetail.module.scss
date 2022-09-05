@@ -1,5 +1,6 @@
 .articleDetailContainer {
     padding: 20px;
+    padding-bottom: 100px;
 
     .coverSwiper {
         height: 500px;
@@ -33,10 +34,7 @@
             margin: 20px 0;
 
             image {
-                width: 80px;
-                height: 80px;
-                border-radius: 80px;
-                border: 1px solid $primaryColor;
+                @include portrait(80px)
             }
 
             .infoSection {
@@ -71,15 +69,43 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-
+        margin: 20px 0;
         .footerLeft {
-            font-size: 32px;
+            font-size: 40px;
         }
 
-        .FooterRight {
-            font-size: 24px;
+        .footerRight {
+            font-size: 28px;
             color: #9d9d9d;
             display: flex;
+        }
+    }
+
+    .commentScroll {
+        height: calc(100vh - 100px);
+        
+        .commentItem {
+            padding: 20px 0;
+
+            .commentHeader {
+                display: flex;
+
+                image {
+                    @include portrait(80px)
+                }
+
+                .commentInfo {
+                    margin-left: 25px;
+                    .nickName {
+                        font-size: 36px;
+                    }
+
+                    .commentTime {
+                        color: #9d9d9d;
+                        font-size: 24px;
+                    }
+                }
+            }
         }
     }
 

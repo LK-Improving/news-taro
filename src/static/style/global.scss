@@ -17,3 +17,10 @@ $primaryColor:#e98e97;
     padding-left: 20px;
     color: $primaryColor;
 }
+
+
+@mixin portrait($size:60px){
+    width: $size;
+    height: $size;
+    border-radius: $size;
+}

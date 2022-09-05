@@ -129,13 +129,22 @@
                 }
             }
 
-
             .detail {
                 line-height: 30px;
                 font-size: 30px;
                 color: #9d9d9d;
-                display: flex;
-                justify-content: space-between;
+                clear: both;
+                .browse{
+                    font-size: 32px;
+                }
+                .info{
+                    float: right;
+                    margin-left: auto;
+                    .count{
+                        font-size: 30px;
+                        margin-left: 10px;
+                    }
+                }
             }
         }
     }

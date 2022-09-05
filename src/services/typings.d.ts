@@ -53,13 +53,23 @@ declare namespace API {
     userId: number;
     likeCount: number;
     collectionCount: number;
-    commentCount: number
+    commentCount: number;
   }
+  // 分页
   interface PageType {
     currPage: number;
     list: any[];
     pageSize: number;
     totalCount: number;
     totalPage: number;
+  }
+  // 评论
+  interface commentType {
+    articleId: string;
+    commentId: string;
+    content: string;
+    createTime: string;
+    member: MemberYype;
+    memberId: string;
   }
 }

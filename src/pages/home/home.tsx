@@ -38,7 +38,6 @@ const Home: React.FC = () => {
   useEffect(() => {
     getCategoryList();
   }, []);
-
   // 监听分类
   useEffect(() => {
     set();
@@ -107,8 +106,8 @@ const Home: React.FC = () => {
 
   // 滚动至底部添加下一页文章
   const handleScrollToLower: ScrollViewProps["onScrollToLower"] = () => {
-    let currenPAge = page;
-    if (currenPAge === totalPage) {
+    let currentPAge = page;
+    if (currentPAge === totalPage) {
       return;
     }
     if (!isThrottle) {
@@ -118,7 +117,7 @@ const Home: React.FC = () => {
       });
       isThrottle = true;
       setTimeout(() => {
-        setPage(currenPAge + 1);
+        setPage(currentPAge + 1);
       }, 1500);
     }
   };
@@ -133,6 +132,10 @@ const Home: React.FC = () => {
     setTimeout(() => {
       setIsRefreesh(false);
     }, 1500);
+  };
+
+  const onReachBottom = e => {
+    console.log(e);
   };
 
   // 跳转页面
@@ -230,7 +233,11 @@ const Home: React.FC = () => {
                   <View className={Style.header}>
                     <Image
                       className={Style.portrait}
-                      src="/assets/images/tabBar/个人-selected.png"
+                      src={
+                        item.member.portrait
+                          ? item.member.portrait
+                          : "/assets/images/tabBar/个人-selected.png"
+                      }
                     />
                     <View>
                       <View className={Style.nickNmae}>
@@ -275,13 +282,33 @@ const Home: React.FC = () => {
                 </View>
                 <View className={Style.item}>
                   <View className={Style.detail}>
-                    <Text>{item.member.nickname}</Text>
-                    <Text>
+                    <Text className={"iconfont icon-liulan " + Style.browse}>
+                    &nbsp;
                       {item.readCount >= 10000
                         ? Math.round(item.readCount / 10000)
                         : item.readCount}
                       看过
                     </Text>
+                    <View className={Style.info}>
+                      <Text className={"iconfont icon-dianzan " + Style.count}>
+                        &nbsp;
+                        {item.likeCount >= 10000
+                        ? Math.round(item.likeCount / 10000)
+                        : item.likeCount}
+                      </Text>
+                      <Text className={"iconfont icon-shoucang " + Style.count}>
+                      &nbsp;
+                      {item.commentCount >= 10000
+                        ? Math.round(item.commentCount / 10000)
+                        : item.commentCount}
+                      </Text>
+                      <Text className={"iconfont icon-pinglun " + Style.count}>
+                      &nbsp;
+                      {item.commentCount >= 10000
+                        ? Math.round(item.commentCount / 10000)
+                        : item.commentCount}
+                      </Text>
+                    </View>
                   </View>
                 </View>
               </View>

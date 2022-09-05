@@ -3,5 +3,8 @@ export default definePageConfig({
   enableShareAppMessage: true,
   usingComponents:{
     "mpWeixin": "../../components/mp-weixin/index",
+  },
+  window:{
+    onReachBottomDistance: 100
   }
 })

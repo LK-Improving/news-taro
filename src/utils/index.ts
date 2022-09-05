@@ -1,5 +1,6 @@
 // 函数防抖
-export const debounce = (t:any,fn: Function, delay: number) => {
+export const debounce = (fn: Function, delay: number) => {
+  let t = null;
   return () => {
     if (t !== null) {
         console.log('clear');
