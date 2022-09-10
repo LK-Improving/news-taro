@@ -19,7 +19,7 @@ export default {
   reqDelLike: (params: object) => post(prefix + "/like/delete", params),
 
   // 查询当前用户是否点赞该文章
-  reqisLike: (params: object) => post(prefix + "/like/islike", params),
+  reqisLike: (params: object) => get(prefix + "/like/islike", params),
 
   // 收藏文章
   reqSaveCollection: (params: object) => post(prefix + "/collection/save", params),
@@ -28,8 +28,9 @@ export default {
   reqDelCollection: (params: object) => post(prefix + "/collection/delete", params),
 
   // 查询当前用户是否收藏该文章
-  reqIsCollection: (params: object) => post(prefix + "/collection/iscollection", params),
+  reqIsCollection: (params: object) => get(prefix + "/collection/iscollection", params),
 
   // 根据文章ID获取评论
-  reqCommentListByArticleId: (params:object) => get(prefix + "/comment/list",params)
+  reqCommentListByArticleId: (params:object) => get(prefix + "/comment/list",params),
+
 };

@@ -42,40 +42,27 @@
             @include activeBtn();
         }
     }
-    // 封面/预览
+    .coverList{
+        display: flex;
+        .cover{
+            width: 30%;
+            height: 250px;
+            background-color: #d7d7d7;
+            display: flex;
+            margin: 20px 0;
+            margin-right: 20px;
+            Text{
+                margin: auto;
+                font-size: 60px;
+            }
+        }
+    }
+    // 预览
     .contentItem {
         height: 180px;
         padding: 20px 0;
         display: flex;
         border-bottom: 1px solid #d7d7d7;
-
-        .content {
-            flex: 1;
-
-            .title {
-                //多行文本溢出隐藏用...代替
-                height: 150px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                line-height: 50px;
-                display: -webkit-box;
-                -webkit-box-orient: vertical; // 设置对齐模式：垂直
-                -webkit-line-clamp: 3;
-            }
-
-            .detail {
-                line-height: 30px;
-                font-size: 30px;
-                color: #9d9d9d;
-                display: flex;
-                justify-content: space-between;
-            }
-        }
-
-        .contentImage {
-            width: 200px;
-            height: 180px;
-        }
     }
     .buttonGroup{
         display: flex;
@@ -86,7 +73,7 @@
         .publishBtn{
             @include activeBtn();
         }
-        .saveBtn{
+        .draftBtn{
             @include defaultBtn();
         }
     }

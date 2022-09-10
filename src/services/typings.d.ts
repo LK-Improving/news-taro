@@ -22,11 +22,13 @@ declare namespace API {
     status: number;
     username: string;
   }
+
   // 文章分类
   interface CategoryType {
-    categoryId: number;
-    categoryName: string;
+    catId: number;
+    catName: string;
   }
+  
   // 文章图片
   interface CoverType {
     articleId: number;
@@ -38,7 +40,7 @@ declare namespace API {
   }
   // 文章
   interface ArticleType {
-    articleId: number;
+    articleId: string;
     authorId: number;
     catName: string;
     content: string;

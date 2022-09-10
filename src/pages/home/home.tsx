@@ -12,6 +12,7 @@ import {
 import Taro from "@tarojs/taro";
 import Style from "./home.module.scss";
 import articleApi from "../../services/api/articleApi";
+import ArticleCard from "../../components/articleCard";
 
 // 节流
 let isThrottle = false;
@@ -188,16 +189,16 @@ const Home: React.FC = () => {
         {categoryList.map(item => {
           return (
             <View
-              key={item.categoryId}
+              key={item.catId}
               onClick={handleChangeCategory}
-              data-key={item.categoryId}
+              data-key={item.catId}
               className={
-                key === item.categoryId
+                key === item.catId
                   ? Style.navItem + " " + Style.active
                   : Style.navItem
               }
             >
-              {item.categoryName}
+              {item.catName}
             </View>
           );
         })}
@@ -217,102 +218,7 @@ const Home: React.FC = () => {
           refresherTriggered={isRefreesh}
         >
           {articleList.map(item => {
-            return (
-              <View
-                key={item.articleId}
-                onClick={e =>
-                  to(
-                    "/pages/articleDetail/articleDetail?articleId=" +
-                      e.currentTarget.id
-                  )
-                }
-                id={item.articleId.toString()}
-                className={Style.articleItem}
-              >
-                <View className={Style.item}>
-                  <View className={Style.header}>
-                    <Image
-                      className={Style.portrait}
-                      src={
-                        item.member.portrait
-                          ? item.member.portrait
-                          : "/assets/images/tabBar/个人-selected.png"
-                      }
-                    />
-                    <View>
-                      <View className={Style.nickNmae}>
-                        {item.member.nickname}
-                      </View>
-
-                      <View className={Style.publishTime}>
-                        {item.publishTime}
-                      </View>
-                    </View>
-                    <View className={Style.right}>
-                      <Button>关注</Button>
-                    </View>
-                  </View>
-                </View>
-                <View className={Style.item}>
-                  <View className={Style.content}>
-                    <Text className={Style.title}>{item.title}</Text>
-                  </View>
-                </View>
-                <View className={Style.item}>
-                  <View className={Style.cover}>
-                    {item.coverList.length > 0 ? (
-                      item.coverList.length > 1 ? (
-                        item.coverList.map((icoverItem, index) => {
-                          return index < 3 ? (
-                            <Image
-                              key={icoverItem.id}
-                              className={Style.contentImage}
-                              src={icoverItem.imgUrl}
-                            />
-                          ) : null;
-                        })
-                      ) : (
-                        <Image
-                          className={Style.contentImage}
-                          src={item.coverList[0].imgUrl}
-                        />
-                      )
-                    ) : null}
-                  </View>
-                </View>
-                <View className={Style.item}>
-                  <View className={Style.detail}>
-                    <Text className={"iconfont icon-liulan " + Style.browse}>
-                    &nbsp;
-                      {item.readCount >= 10000
-                        ? Math.round(item.readCount / 10000)
-                        : item.readCount}
-                      看过
-                    </Text>
-                    <View className={Style.info}>
-                      <Text className={"iconfont icon-dianzan " + Style.count}>
-                        &nbsp;
-                        {item.likeCount >= 10000
-                        ? Math.round(item.likeCount / 10000)
-                        : item.likeCount}
-                      </Text>
-                      <Text className={"iconfont icon-shoucang " + Style.count}>
-                      &nbsp;
-                      {item.commentCount >= 10000
-                        ? Math.round(item.commentCount / 10000)
-                        : item.commentCount}
-                      </Text>
-                      <Text className={"iconfont icon-pinglun " + Style.count}>
-                      &nbsp;
-                      {item.commentCount >= 10000
-                        ? Math.round(item.commentCount / 10000)
-                        : item.commentCount}
-                      </Text>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            );
+            return <ArticleCard key={item.articleId} article={item} to={to} />;
           })}
         </ScrollView>
       ) : (

@@ -14,124 +14,128 @@
             font-size: 32px;
             flex: 1;
             padding: 0 20px;
+
             input {
                 margin: 0 20rpx;
                 height: 60rpx;
                 flex: 1;
             }
+
             .clear {
                 font-size: 32rpx;
                 color: lightgray;
             }
+
             .searchIcon {
                 font-size: 40rpx;
                 color: lightgray;
             }
         }
-        .searchBtn{
+
+        .searchBtn {
             padding: 0;
             background-color: transparent;
             font-size: 32px;
-            line-height: 60px;  
+            line-height: 60px;
             height: 60px;
             display: inline;
             color: $primaryColor;
             margin-left: 20px;
-            &::after{
+
+            &::after {
                 border: none;
             }
         }
     }
 
-
-
-
-}
-
-
-
-/* 热搜榜 */
-.hotContainer .title {
-    font-size: 30rpx;
-    height: 80rpx;
-    line-height: 80rpx;
-    border-bottom: 1rpx solid #eee;
-}
-
-.hotList {
-    display: flex;
-    flex-wrap: wrap;
-}
-
-.hotItem {
-    width: 50%;
-    height: 80rpx;
-    line-height: 80rpx;
-    font-size: 26rpx;
-
-    .order {
-        margin: 0 10rpx;
+    /* 搜索结果区域 */
+    .searchContent {
+        color: rgb(147, 166, 229);
+        height: 80rpx;
+        line-height: 80rpx;
+        font-size: 24rpx;
+        border-bottom: 1rpx solid $primaryColor;
+        @include textOmitted
     }
 
-    .iconImg {
-        width: 35rpx;
-        height: 20rpx;
-        margin-left: 10rpx;
-    }
-}
+    .searchList {
+        .searchItem {
+            height: 80rpx;
+            line-height: 80rpx;
+            display: flex;
 
-/* 搜索结果区域 */
-.searchContent {
-    color: rgb(147, 166, 229);
-    height: 80rpx;
-    line-height: 80rpx;
-    font-size: 24rpx;
-    border-bottom: 1rpx solid #d43c33;
-}
-
-.searchItem {
-    height: 80rpx;
-    line-height: 80rpx;
-    display: flex;
-
-    .content {
-        flex: 1;
-        margin-left: 20rpx;
-        border-bottom: 1rpx solid #eee;
-    }
-}
-
-
-/* 历史记录 */
-.history {
-    // position: relative;
-    display: flex;
-    flex-flow: wrap;
-    margin: 20rpx 0;
-
-    .title {
-        font-size: 28rpx;
-        height: 50rpx;
-        line-height: 50rpx;
+            .content {
+                flex: 1;
+                margin-left: 20rpx;
+                border-bottom: 1rpx solid #eee;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                font-size: 36px;
+            }
+        }
     }
 
-    .historyItem {
-        font-size: 26rpx;
-        height: 50rpx;
-        line-height: 50rpx;
-        background: #ededed;
-        margin-left: 20rpx;
-        padding: 0 30rpx;
-        border-radius: 20rpx;
-        margin-bottom: 20rpx;
+    /* 历史记录 */
+    .history {
+        // position: relative;
+        display: flex;
+        flex-flow: wrap;
+        margin: 20rpx 0;
+
+        .title {
+            font-size: 30rpx;
+            height: 50rpx;
+            line-height: 50rpx;
+        }
+
+        .historyItem {
+            max-width: 200px;
+            font-size: 26rpx;
+            height: 50rpx;
+            line-height: 50rpx;
+            background: #ededed;
+            margin-left: 20rpx;
+            padding: 0 30rpx;
+            border-radius: 20rpx;
+            margin-bottom: 20rpx;
+            @include textOmitted
+        }
+
+        .delete {
+            // 定位方法
+            // position: absolute;
+            // bottom: 30rpx;
+            // right: 15rpx;
+            margin-left: auto;
+            font-size: 36rpx;
+        }
     }
 
-    .delete {
-        // 定位方法
-        // position: absolute;
-        // bottom: 30rpx;
-        // right: 15rpx;
-        margin-left: auto;
-        font-size: 36rpx;
+    /* 热搜榜 */
+    .hotContainer {
+        .title {
+            font-size: 30rpx;
+            height: 80rpx;
+            line-height: 80rpx;
+            border-bottom: 1rpx solid #eee;
+        }
+
+        .hotList {
+            display: flex;
+            flex-wrap: wrap;
+
+            .hotItem {
+                width: 50%;
+                height: 80rpx;
+                line-height: 80rpx;
+                font-size: 26rpx;
+                @include textOmitted;
+
+                .order {
+                    margin: 0 10rpx;
+                }
+            }
+        }
     }
 }

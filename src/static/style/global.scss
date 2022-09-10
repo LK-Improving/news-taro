@@ -18,9 +18,16 @@ $primaryColor:#e98e97;
     color: $primaryColor;
 }
 
-
-@mixin portrait($size:60px){
+// 头像
+@mixin portrait($size:60px) {
     width: $size;
     height: $size;
     border-radius: $size;
+}
+
+// 单行文本省略
+@mixin textOmitted {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }

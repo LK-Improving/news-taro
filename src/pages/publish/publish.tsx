@@ -1,26 +1,38 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, Editor, Text, Textarea, Block, Image, Button } from "@tarojs/components";
-import Taro,{ getCurrentInstance } from "@tarojs/taro";
-// import content2 from "./content";
+import {
+  View,
+  Editor,
+  Text,
+  Textarea,
+  Block,
+  Image,
+  Button,
+  EventProps
+} from "@tarojs/components";
+import Taro, { getCurrentInstance } from "@tarojs/taro";
+import { observer } from "mobx-react-lite";
 import Style from "./publish.module.scss";
-
+import articleApi from "../../services/api/articleApi";
+import ArticleCard from "../../components/articleCard";
+import useStore from "../../store";
+import { uploadFile } from "../../utils/request";
 
 interface CtxType {
-  clear?: Function;
-  getContent?: Function;
-  imgList?: string[];
-  insertAudio?: Function;
-  insertHtml?: Function;
-  insertImg?: Function;
-  insertLink?: Function;
-  insertTable?: Function;
-  insertText?: Function;
-  insertVideo?: Function;
-  plugins?: Function;
-  redo?: Function;
-  undo?: Function;
-  getSrc?: Function;
-  getRect?: Function;
+  clear: Function;
+  getContent: Function;
+  imgList: string[];
+  insertAudio: Function;
+  insertHtml: Function;
+  insertImg: Function;
+  insertLink: Function;
+  insertTable: Function;
+  insertText: Function;
+  insertVideo: Function;
+  plugins: Function;
+  redo: Function;
+  undo: Function;
+  getSrc: Function;
+  getRect: Function;
 }
 
 interface RectType {
@@ -36,9 +48,9 @@ interface RectType {
 
 interface FormType {
   title: string;
-  cotent: string;
-  category?: number;
-  coverSrc?: string;
+  content: string;
+  category: number[];
+  coverList: Partial<API.CoverType>[];
   userID?: string;
 }
 
@@ -68,22 +80,35 @@ function remove(src) {
 }
 
 const Publish: React.FC = () => {
-  const [content, setContent] = useState<string>("");
+  // 是否可编辑
   const [editable, setEditable] = useState<boolean>(false);
+
+  // 分类LIst
+  const [categoryList, setCategoryList] = useState<API.CategoryType[]>([]);
+
   const [formData, setFormData] = useState<FormType>({
     title: "",
-    cotent: "",
-    category: 1
+    content: "",
+    category: [1, 2, 3],
+    coverList: [
+      {
+        imgName: "test",
+        imgUrl: "https://s2.loli.net/2022/09/07/o8uCN2n7Btwfxip.png"
+      }
+    ]
   });
+
   const [modal, setModal] = useState<any>();
+
   // 获取页面实例
   const { page } = getCurrentInstance();
+
   const [ctx, setCtx] = useState<CtxType>();
+
   page?.selectComponent!("#article");
-  const handleInput = e => {
-    console.log(e);
-    console.log(ctx);
-  };
+
+  const { MemberStore } = useStore();
+
   useEffect(() => {
     let article = page?.selectComponent!("#article") as CtxType;
     /**
@@ -194,7 +219,19 @@ const Publish: React.FC = () => {
       });
     };
     setCtx(article);
+    getCategoryList();
   }, []);
+
+  // 获取分类
+  const getCategoryList = async () => {
+    const res = (await articleApi.reqArticleCtaegory()) as API.ResultType & {
+      categoryList: API.CategoryType[];
+    };
+    if (res && res.code === 0) {
+      setCategoryList(res.categoryList);
+    }
+  };
+
   // 调用编辑器接口
   const edit = e => {
     ctx![e]();
@@ -211,28 +248,108 @@ const Publish: React.FC = () => {
   };
   // 保存编辑器内容
   const save = () => {
-    // 避免无法获取到正在编辑的文本内容
-    setTimeout(() => {
-      setContent(ctx!.getContent!());
-      Taro.showModal({
-        title: "保存",
-        content: ctx!.getContent!(),
-        confirmText: "完成",
-        success: res => {
-          if (res.confirm) {
-            // 实际使用时，这里需要上传到服务器
-            // 复制到剪贴板
-            Taro.setClipboardData({
-              data: content
-            });
-            // 结束编辑
-            // setEditable(false);
+    if (ctx?.getContent() !== "<p></p>") {
+      // 避免无法获取到正在编辑的文本内容
+      setTimeout(() => {
+        Taro.showModal({
+          title: "复制至剪贴板并保存?",
+          content: ctx!.getContent!(),
+          confirmText: "完成",
+          success: res => {
+            if (res.confirm) {
+              // 实际使用时，这里需要上传到服务器
+              // 复制到剪贴板
+              Taro.setClipboardData({
+                data: ctx?.getContent()
+              });
+              // 结束编辑
+              setFormData({ ...formData, content: ctx?.getContent() });
+              setEditable(false);
+            }
           }
-        }
+        });
+      }, 50);
+    } else {
+      Taro.showToast({
+        title: "请先输入正文!",
+        icon: "error"
       });
-    }, 50);
+    }
   };
 
+  // 草稿
+  const handleDraft: EventProps["onClick"] = e => {
+    console.log(formData);
+  };
+  // 发布
+  const handlePublish: EventProps["onClick"] =async  () => {
+    const { title, content, category, coverList } = formData;
+    if (title === "") {
+      return Taro.showToast({
+        title: "请输入文章标题！",
+        icon: "error"
+      });
+    }
+    if (content === "") {
+      return Taro.showToast({
+        title: "请输入文章内容！",
+        icon: "error"
+      });
+    }
+    if (category.length < 1) {
+      return Taro.showToast({
+        title: "请选择文章分类！",
+        icon: "error"
+      });
+    }
+    if (!MemberStore.memberInfo.memberId) {
+      return Taro.showToast({
+        title: "您还未登录！",
+        icon: "error",
+        success:()=>{
+          Taro.navigateTo({
+            url: 'pages/pages/register'
+          })
+        }
+      });
+    }
+
+    const params = {
+      title,
+      content,
+      authorId:MemberStore.memberInfo.memberId,
+      categoryList:category.map(item=>({
+        catId : item
+      })),
+      coverList
+    };
+    console.log(params);
+    const res = await articleApi.reqSaveArticle(params) 
+    if (res && res.code === 0) {
+      Taro.showToast({
+        title: '发布发表成功，请等待后台审核！',
+        success: ()=>{
+          Taro.navigateBack()
+        }
+      })
+    }
+  };
+
+  // 上传图片
+  const handleUpload: EventProps["onClick"] =  e => {
+    Taro.chooseMedia({
+      count: 5,
+      mediaType: ["image"],
+      sourceType: ["album", "camera"],
+      camera: "back",
+      success: async (res) => {
+        console.log(res.tempFiles[0].tempFilePath);
+        const res2 = await uploadFile(res.tempFiles[0].tempFilePath)
+        console.log(res2);
+        
+      }
+    });
+  };
   return (
     <View
       className={Style.publishContainer}
@@ -255,6 +372,9 @@ const Publish: React.FC = () => {
             } else {
               if (editable) {
                 setEditable(false);
+                if (ctx?.getContent() !== "<p></p>") {
+                  setFormData({ ...formData, content: ctx?.getContent() });
+                }
               }
             }
           })
@@ -267,12 +387,7 @@ const Publish: React.FC = () => {
       <View className={Style.Block}>
         <Textarea
           placeholder="标题(建议30字以内)"
-          // onFocus={e => {
-          //   console.log(e);a's'ddasd
-          //   setEditable(false);
-          // }}
           maxlength={40}
-          dd
           style={{ minHeight: "150rpx" }}
           autoHeight
           onInput={e => {
@@ -327,7 +442,7 @@ const Publish: React.FC = () => {
         <mpWeixin
           id="article"
           containerStyle="padding:0px;"
-          content={formData.cotent}
+          content={formData.content}
           placeholder="请输入正文"
           emoji
           domain="https://mp-html.oss-cn-hangzhou.aliyuncs.com"
@@ -339,56 +454,77 @@ const Publish: React.FC = () => {
       <View className={Style.Block}>
         <View>请选择分类</View>
         <View className={Style.categoryGroup}>
-          {[1, 2, 3, 4, 5, 6, 7, 8].map(item => {
+          {categoryList.map(item => {
             return (
               <View
                 className={
-                  formData.category === item
+                  formData.category.indexOf(item.catId) !== -1
                     ? Style.radio + " " + Style.active
                     : Style.radio
                 }
-                key={item}
+                key={item.catId}
                 onClick={() => {
-                  if (item !== formData.category) {
-                    setFormData({ ...formData, category: item });
-                  }
+                  formData.category.indexOf(item.catId) !== -1
+                    ? setFormData({
+                        ...formData,
+                        category: formData.category.filter(
+                          categoryId => item.catId !== categoryId
+                        )
+                      })
+                    : setFormData({
+                        ...formData,
+                        category: formData.category.concat(item.catId)
+                      });
                 }}
               >
-                {item}
+                {item.catId}
               </View>
             );
           })}
         </View>
       </View>
-      {/* 封面/预览 */}
+      {/* 封面 */}
       <View className={Style.Block}>
-        <View>封面预览</View>
-        <View className={Style.contentItem}>
-          <View className={Style.content}>
-            <Text className={Style.title}>{formData.title}</Text>
-            <Text style={{backgroundColor: "white"}}></Text>
-            <View className={Style.detail}>
-              <text>lk</text>
-              <text>11122评论</text>
-              <text>6天前</text>
-              <text>X</text>
-            </View>
+        <View>封面</View>
+        <View className={Style.coverList}>
+          {formData.coverList?.map((item, index) => {
+            return (
+              <Image key={index} className={Style.cover} src={item.imgUrl!} />
+            );
+          })}
+          <View className={Style.cover} onClick={handleUpload}>
+            <Text>+</Text>
           </View>
-          <Image
-            className={Style.contentImage}
-            src="/assets/images/个人-selected.png"
-          />
         </View>
+      </View>
+      {/* 预览 */}
+      <View className={Style.Block}>
+        <View>预览</View>
+        <ArticleCard
+          article={{
+            title: formData.title,
+            coverList: formData.coverList as API.CoverType[],
+            member: MemberStore.memberInfo,
+            readCount: 0,
+            likeCount: 0,
+            collectionCount: 0,
+            commentCount: 0
+          }}
+        />
       </View>
       {/* 操作按钮 */}
       <View className={Style.Block}>
         <View className={Style.buttonGroup}>
-          <Button className={Style.publishBtn}>发布</Button>
-          <Button className={Style.saveBtn}>存草稿</Button>
+          <Button className={Style.publishBtn} onClick={handlePublish}>
+            发布
+          </Button>
+          <Button className={Style.draftBtn} onClick={handleDraft}>
+            存草稿
+          </Button>
         </View>
       </View>
     </View>
   );
 };
 
-export default Publish;
+export default observer(Publish);
