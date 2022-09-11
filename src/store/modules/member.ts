@@ -11,7 +11,7 @@ class MemberStore{
         makeAutoObservable(this)
     }
 
-    serMmberInfo = (val:Partial<API.MemberYype>) => {
+    setMmberInfo = (val:Partial<API.MemberYype>) => {
         this.memberInfo = val
     }
 }

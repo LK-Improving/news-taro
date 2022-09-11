@@ -1,0 +1,34 @@
+.container{
+    padding: 20px 0;
+    height: calc(100vh - 40px);
+    background-color: #f0f0f0;
+    .myForm{
+        margin: 20px 0;
+        background-color: white;
+        &>View {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            font-size: 32px;
+            min-height: 80px;
+            border-bottom: 1px solid #f1e1e1;
+            .left{
+                flex: 1;
+                margin-right: 100px;
+            }
+            .right{
+                color: gray;
+                max-width: 400px;
+                input{
+                    text-align: right
+                }
+                .portrait{
+                    @include portrait(120px);
+                }
+                textarea{
+                    max-width: 400px;
+                }
+            }
+        }
+    }
+}

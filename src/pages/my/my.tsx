@@ -7,7 +7,7 @@ import useStore from "../../store";
 
 const My: React.FC = () => {
   const {
-    MemberStore: { memberInfo, serMmberInfo }
+    MemberStore: { memberInfo, setMmberInfo }
   } = useStore();
 
   useEffect(() => {
@@ -20,28 +20,26 @@ const My: React.FC = () => {
   // 推出操作
   const handleExit: EventProps["onClick"] = () => {
     Taro.removeStorageSync('memberInfo')
-    serMmberInfo({})
+    setMmberInfo({})
   };
   // 跳转登录
-  const toLogin: EventProps["onClick"] = () => {
+  const to = (url:string) => {
     Taro.navigateTo({
-      url: "/pages/register/register"
+      url
     });
   };
 
   return (
     <View className={Style.myContainer}>
       {/* 用户部分 */}
-      <View className={Style.userSection} onClick={toLogin}>
+      <View className={Style.userSection} onClick={()=>to("/pages/register/register")}>
         <View className={Style.userInfo}>
           <Image
             className={Style.portrait}
             src={
-              memberInfo
-                ? memberInfo.portrait
+              memberInfo&&memberInfo.portrait
                   ? memberInfo.portrait
                   : "../../assets/images/tabBar/个人-selected.png"
-                : "/assets/images/tabBar/个人-selected.png"
             }
           />
           <View>
@@ -139,6 +137,17 @@ const My: React.FC = () => {
               className={Style.listIconfont + " iconfont icon-lishi"}
             ></Text>
             <Text>历史</Text>
+          </View>
+          <View>
+            <Text className={"iconfont icon-right " + Style.iconfont}></Text>
+          </View>
+        </View>
+        <View className={Style.handleItem} onClick={()=>to("/pages/personalSetting/personalSetting")}>
+          <View>
+            <Text
+              className={Style.listIconfont + " iconfont icon-lishi"}
+            ></Text>
+            <Text>个人设置</Text>
           </View>
           <View>
             <Text className={"iconfont icon-right " + Style.iconfont}></Text>

@@ -4,10 +4,13 @@ const prefix = "/member";
 
 export default {
   // 密码登录
-  reqLoginByPassword: (params: any) => post(prefix + "/login/password", params),
+  reqLoginByPassword: (params: object) => post(prefix + "/login/password", params),
 
   // 手机号登录/注册
-  reqLoginByMobile: (params: any) => post(prefix + "/login/mobile", params),
+  reqLoginByMobile: (params: object) => post(prefix + "/login/mobile", params),
+
+  // 修改用户信息
+  reqUpdateMember: (params: object) => post(prefix + "/update", params),
 
   // 发表评论
   reqSaveComment: (params: object) => post(prefix + "/comment/save", params),

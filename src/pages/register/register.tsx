@@ -78,7 +78,7 @@ const Register: React.FC = () => {
     if (res.code === 0) {
       // 存储会员信息
       Taro.setStorageSync("memberInfo", res.member);
-      MemberStore.serMmberInfo(res.member);
+      MemberStore.setMmberInfo(res.member);
       // 跳转至之前的页面
       const pages = Taro.getCurrentPages();
       if (pages.length >= 2) {
