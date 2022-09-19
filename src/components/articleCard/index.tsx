@@ -1,5 +1,9 @@
-import { Button, Image, Text, View } from "@tarojs/components";
-import React from "react";
+import { Button, EventProps, Image, Text, View } from "@tarojs/components";
+import Taro from "@tarojs/taro";
+import { observer } from "mobx-react-lite";
+import React, { useEffect } from "react";
+import memberApi from "../../services/api/memberApi";
+import useStore from "../../store";
 import Style from "./index.module.scss";
 
 interface OptionType {
@@ -10,9 +14,12 @@ interface IPropType {
   article: Partial<API.ArticleType>;
   to?: Function;
   option?: OptionType;
+  style?: React.CSSProperties
 }
 
-const ArticleCard: React.FC<IPropType> = ({ article, to, option }) => {
+const ArticleCard: React.FC<IPropType> = ({ article, to, option, style }) => {
+  const { MemberStore } = useStore();
+
   return (
     <View
       onClick={e =>
@@ -25,6 +32,7 @@ const ArticleCard: React.FC<IPropType> = ({ article, to, option }) => {
       }
       id={article.articleId}
       className={Style.articleCard}
+      style={style}
     >
       {/* 头部 */}
       <View className={Style.header}>
@@ -41,9 +49,6 @@ const ArticleCard: React.FC<IPropType> = ({ article, to, option }) => {
 
           <View className={Style.publishTime}>{article.publishTime}</View>
         </View>
-          <View className={Style.right}>
-            <Button>关注</Button>
-          </View>
       </View>
       {/* 内容 */}
       <View className={Style.body}>
@@ -74,28 +79,28 @@ const ArticleCard: React.FC<IPropType> = ({ article, to, option }) => {
       <View className={Style.footer}>
         <Text className={"iconfont icon-liulan " + Style.browse}>
           &nbsp;
-          {article.readCount >= 10000
-            ? Math.round(article.readCount / 10000)
+          {article.readCount && article.readCount >= 10000
+            ? Math.round(article.readCount / 10000) + "w"
             : article.readCount}
           看过
         </Text>
         <View className={Style.info}>
           <Text className={"iconfont icon-dianzan " + Style.count}>
             &nbsp;
-            {article.likeCount >= 10000
-              ? Math.round(article.likeCount / 10000)
+            {article.likeCount && article.likeCount >= 10000
+              ? Math.round(article.likeCount / 10000) + "w"
               : article.likeCount}
           </Text>
           <Text className={"iconfont icon-shoucang " + Style.count}>
             &nbsp;
-            {article.commentCount >= 10000
-              ? Math.round(article.commentCount / 10000)
-              : article.commentCount}
+            {article.collectionCount && article.collectionCount >= 10000
+              ? Math.round(article.collectionCount / 10000) + "w"
+              : article.collectionCount}
           </Text>
           <Text className={"iconfont icon-pinglun " + Style.count}>
             &nbsp;
-            {article.commentCount >= 10000
-              ? Math.round(article.commentCount / 10000)
+            {article.commentCount && article.commentCount >= 10000
+              ? Math.round(article.commentCount / 10000) + "w"
               : article.commentCount}
           </Text>
         </View>
@@ -104,4 +109,4 @@ const ArticleCard: React.FC<IPropType> = ({ article, to, option }) => {
   );
 };
 
-export default ArticleCard;
+export default observer(ArticleCard);

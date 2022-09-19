@@ -20,7 +20,7 @@ import arcImag from "../../assets/images/arc.png";
 import articleApi from "../../services/api/articleApi";
 import memberApi from "../../services/api/memberApi";
 import useStore from "../../store";
-import { debounce } from "../..//utils";
+import { debounce, throllte } from "../..//utils";
 
 const ArticleDetail: React.FC = () => {
   // 文章详情
@@ -111,14 +111,19 @@ const ArticleDetail: React.FC = () => {
     // 即将卸载
     return () => {
       console.log("即将卸载");
-      const {likeState,collectionState,firstLikeState,firstCollectionState} = stateRef!.current
-      console.log(likeState,firstLikeState);
-      console.log(collectionState,firstCollectionState);
+      const {
+        likeState,
+        collectionState,
+        firstLikeState,
+        firstCollectionState
+      } = stateRef!.current;
+      // console.log(likeState, firstLikeState);
+      // console.log(collectionState, firstCollectionState);
       if (likeState !== firstLikeState) {
-        isLikeArticle()
-      } 
+        isLikeArticle();
+      }
       if (collectionState !== firstCollectionState) {
-        isCollectionArticle()
+        isCollectionArticle();
       }
     };
   }, []);
@@ -189,9 +194,11 @@ const ArticleDetail: React.FC = () => {
 
   //获取文章详情
   const getArticleDetail = async () => {
-    const res = (await articleApi.reqArticleInfo(
-      articleId
-    )) as API.ResultType & {
+    const params = {
+      articleId,
+      memberId: MemberStore.memberInfo.memberId || null
+    };
+    const res = (await articleApi.reqArticleInfo(params)) as API.ResultType & {
       article: API.ArticleType;
     };
     if (res && res.code === 0) {
@@ -249,11 +256,23 @@ const ArticleDetail: React.FC = () => {
 
   // 点赞/取消点赞
   const handleLike: EventProps["onClick"] = () => {
+    if (!MemberStore.memberInfo.memberId) {
+      return Taro.showToast({
+        title: "请登陆后再操作！",
+        icon: "error"
+      });
+    }
     setIsLike(!isLike);
   };
 
   // 收藏/取消收藏
   const handleCollection: EventProps["onClick"] = () => {
+    if (!MemberStore.memberInfo.memberId) {
+      return Taro.showToast({
+        title: "请登陆后再操作！",
+        icon: "error"
+      });
+    }
     setIsCollection(!isCollection);
     if (!isCollection) {
       Taro.showToast({
@@ -282,8 +301,8 @@ const ArticleDetail: React.FC = () => {
     };
     if (stateRef.current.likeState) {
       memberApi.reqSaveLike(params);
-    } else{
-      memberApi.reqDelLike(params)
+    } else {
+      memberApi.reqDelLike(params);
     }
   };
 
@@ -295,8 +314,8 @@ const ArticleDetail: React.FC = () => {
     };
     if (stateRef.current.collectionState) {
       memberApi.reqSaveCollection(params);
-    } else{
-      memberApi.reqDelCollection(params)
+    } else {
+      memberApi.reqDelCollection(params);
     }
   };
   // 评论
@@ -328,6 +347,37 @@ const ArticleDetail: React.FC = () => {
     }, 1500);
   };
 
+  // 订阅
+  const handleSubscribe: EventProps["onClick"] = async () => {
+    const params = {
+      subscribeId: articleDetail.member?.memberId,
+      memberId: MemberStore.memberInfo.memberId
+    };
+    const res = await memberApi.reqSaveSubscribe(params);
+    if (res && res.code === 0) {
+      setArticleDetail({ ...articleDetail, isSubscribe: 1 });
+    }
+  };
+
+  // 取消订阅
+  const handlCanelSubscribe: EventProps["onClick"] = () => {
+    Taro.showModal({
+      title: "提示",
+      content: "你确定要取消关注吗？",
+      success: async res2 => {
+        if (res2.confirm) {
+          const params = {
+            subscribe_id: articleDetail.member?.memberId,
+            member_id: MemberStore.memberInfo.memberId
+          };
+          const res = await memberApi.reqCanelSubscribe(params);
+          if (res && res.code === 0) {
+            setArticleDetail({ ...articleDetail, isSubscribe: 0 });
+          }
+        }
+      }
+    });
+  };
   return (
     <View className={Style.articleDetailContainer}>
       {/* 封面 */}
@@ -367,7 +417,19 @@ const ArticleDetail: React.FC = () => {
                 {/* {'来自' + articleDetail.city} */}
               </View>
             </View>
-            <Button>关注</Button>
+            {MemberStore.memberInfo.memberId &&
+            articleDetail.authorId !== MemberStore.memberInfo.memberId ? (
+              articleDetail.isSubscribe === 0 ? (
+                <Button onClick={throllte(handleSubscribe, 500)}>关注</Button>
+              ) : (
+                <Button
+                  onClick={throllte(handlCanelSubscribe, 500)}
+                  className={Style.activeBtn}
+                >
+                  已关注
+                </Button>
+              )
+            ) : null}
           </View>
         </View>
         {/* 文章内容 */}

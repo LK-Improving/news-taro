@@ -1,0 +1,88 @@
+.homeContainer {
+    padding: 10px 20px;
+
+    // 导航栏
+    .navScroll {
+        display: flex;
+        white-space: nowrap;
+        height: 70px;
+
+        .navItem {
+            background-color: white;
+            height: 60px;
+            line-height: 60px;
+            margin-right: 40px;
+            font-size: 32px;
+        }
+
+        .active {
+            color: #e98e97;
+            border-bottom: 1px solid #e98e97;
+        }
+    }
+
+    .articleScroll {
+        height: calc(100vh - 90px);
+        background: #f2eeee;
+
+        .commentCard {
+            background-color: white;
+            padding: 20px 0;
+            border-bottom: 2px #f2eeee solid;
+        }
+
+        // 用于继承
+        .item {
+            margin: 10px 0;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            @extend .item;
+
+            .portrait {
+                @include portrait;
+                margin-right: 10px;
+            }
+
+            .nickNmae {
+                font-size: 32px;
+            }
+
+            .publishTime {
+                color: #9d9d9d;
+                font-size: 24px;
+            }
+
+            .right {
+                float: right;
+                margin-left: auto;
+                cursor: pointer;
+                font-size: 32px;
+                color: gray;
+                &::after {
+                    clear: both;
+                }
+            }
+        }
+
+        .body {
+            flex: 1;
+            @extend .item;
+
+            .title {
+                //多行文本溢出隐藏用...代替
+                font-size: 36px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                line-height: 50px;
+                display: -webkit-box;
+                -webkit-box-orient: vertical; // 设置对齐模式：垂直
+                -webkit-line-clamp: 2;
+            }
+
+
+        }
+    }
+}

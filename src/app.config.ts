@@ -1,5 +1,7 @@
 export default defineAppConfig({
   pages: [
+    'pages/notify/notify',
+    'pages/commonlyUsed/commonlyUsed',
     'pages/my/my',
     'pages/personalSetting/personalSetting',
     'pages/home/home',

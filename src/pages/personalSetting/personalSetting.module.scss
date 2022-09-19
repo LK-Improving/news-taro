@@ -31,4 +31,8 @@
             }
         }
     }
+    .saveBtn{
+        @include activeBtn;
+        margin: 0 20px;
+    }
 }

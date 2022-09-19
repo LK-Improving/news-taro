@@ -41,7 +41,7 @@ declare namespace API {
   // 文章
   interface ArticleType {
     articleId: string;
-    authorId: number;
+    authorId: string;
     catName: string;
     content: string;
     coverList: CoverType[];
@@ -56,6 +56,7 @@ declare namespace API {
     likeCount: number;
     collectionCount: number;
     commentCount: number;
+    isSubscribe:number;
   }
   // 分页
   interface PageType {

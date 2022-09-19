@@ -13,6 +13,7 @@ import Taro from "@tarojs/taro";
 import Style from "./home.module.scss";
 import articleApi from "../../services/api/articleApi";
 import ArticleCard from "../../components/articleCard";
+import useStore from "../../store";
 
 // 节流
 let isThrottle = false;
@@ -34,6 +35,8 @@ const Home: React.FC = () => {
 
   // 总页数
   const [totalPage, setTotalPage] = useState<number>(1);
+
+  const { MemberStore } = useStore();
 
   // 初始化
   useEffect(() => {
@@ -85,7 +88,8 @@ const Home: React.FC = () => {
     const params = {
       page,
       limit: 10,
-      catId: key
+      catId: key,
+      memberId: MemberStore.memberInfo.memberId || null
     };
     const res = (await articleApi.reqArticleListByCatId(
       params

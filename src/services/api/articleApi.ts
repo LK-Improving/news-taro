@@ -8,7 +8,7 @@ export default {
   // 根据分类获取所有文章
   reqArticleListByCatId: (params: object) => get(prefix + "/list", params),
   // 文章详情
-  reqArticleInfo: (value: string) => get(prefix + "/info/" + value),
+  reqArticleInfo: (params: object) => get(prefix + "/info", params),
 
   // 关键字搜索
   reqSearchArticle: (params: object) => get(prefix + "/search", params),

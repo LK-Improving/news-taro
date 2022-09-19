@@ -19,11 +19,11 @@ const My: React.FC = () => {
   }, []);
   // 推出操作
   const handleExit: EventProps["onClick"] = () => {
-    Taro.removeStorageSync('memberInfo')
-    setMmberInfo({})
+    Taro.removeStorageSync("memberInfo");
+    setMmberInfo({});
   };
   // 跳转登录
-  const to = (url:string) => {
+  const to = (url: string) => {
     Taro.navigateTo({
       url
     });
@@ -32,14 +32,17 @@ const My: React.FC = () => {
   return (
     <View className={Style.myContainer}>
       {/* 用户部分 */}
-      <View className={Style.userSection} onClick={()=>to("/pages/register/register")}>
+      <View
+        className={Style.userSection}
+        onClick={() => to("/pages/register/register")}
+      >
         <View className={Style.userInfo}>
           <Image
             className={Style.portrait}
             src={
-              memberInfo&&memberInfo.portrait
-                  ? memberInfo.portrait
-                  : "../../assets/images/tabBar/个人-selected.png"
+              memberInfo && memberInfo.portrait
+                ? memberInfo.portrait
+                : "../../assets/images/tabBar/个人-selected.png"
             }
           />
           <View>
@@ -56,8 +59,8 @@ const My: React.FC = () => {
           <Text className={"iconfont icon-right " + Style.iconfont}></Text>
         </View>
       </View>
-      {/* 用户Cards */}
-      <View className={Style.userCards}>
+      {/* 用户信息2 */}
+      <View className={Style.myWrapper}>
         <View className={Style.card}>
           <View className={Style.num}>0</View>
           <View>资讯</View>
@@ -75,25 +78,44 @@ const My: React.FC = () => {
           <View>关注</View>
         </View>
       </View>
-      {/* 用户导航 */}
-      <View className={Style.userCards}>
-        <View className={Style.card}>
-          <View className={"iconfont icon-dianzan " + Style.navIconfont}></View>
-          <View>点赞</View>
-        </View>
-        <View className={Style.card}>
+      {/* 常用 */}
+      <View>
+        <View className={Style.title}>常用</View>
+        <View className={Style.myWrapper}>
           <View
-            className={"iconfont icon-shoucang " + Style.navIconfont}
-          ></View>
-          <View>收藏</View>
-        </View>
-        <View className={Style.card}>
-          <View className={"iconfont icon-pinglun " + Style.navIconfont}></View>
-          <View>评论</View>
-        </View>
-        <View className={Style.card}>
-          <View className={"iconfont icon-lishi " + Style.navIconfont}></View>
-          <View>浏览历史</View>
+            className={Style.card}
+            onClick={() => to("/pages/commonlyUsed/commonlyUsed?key=0")}
+          >
+            <View
+              className={"iconfont icon-dianzan " + Style.navIconfont}
+            ></View>
+            <View>点赞</View>
+          </View>
+          <View
+            className={Style.card}
+            onClick={() => to("/pages/commonlyUsed/commonlyUsed?key=1")}
+          >
+            <View
+              className={"iconfont icon-shoucang " + Style.navIconfont}
+            ></View>
+            <View>收藏</View>
+          </View>
+          <View
+            className={Style.card}
+            onClick={() => to("/pages/commonlyUsed/commonlyUsed?key=2")}
+          >
+            <View
+              className={"iconfont icon-pinglun " + Style.navIconfont}
+            ></View>
+            <View>评论</View>
+          </View>
+          <View
+            className={Style.card}
+            onClick={() => to("/pages/commonlyUsed/commonlyUsed?key=3")}
+          >
+            <View className={"iconfont icon-lishi " + Style.navIconfont}></View>
+            <View>浏览历史</View>
+          </View>
         </View>
       </View>
       {/* 用户导航2 */}
@@ -142,7 +164,10 @@ const My: React.FC = () => {
             <Text className={"iconfont icon-right " + Style.iconfont}></Text>
           </View>
         </View>
-        <View className={Style.handleItem} onClick={()=>to("/pages/personalSetting/personalSetting")}>
+        <View
+          className={Style.handleItem}
+          onClick={() => to("/pages/personalSetting/personalSetting")}
+        >
           <View>
             <Text
               className={Style.listIconfont + " iconfont icon-lishi"}

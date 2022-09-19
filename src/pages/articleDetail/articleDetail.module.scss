@@ -60,6 +60,9 @@
                 height: 60px;
                 line-height: 60px;
                 border-radius: 5px;
+                @include defaultBtn
+            }
+            .activeBtn{
                 @include activeBtn
             }
         }

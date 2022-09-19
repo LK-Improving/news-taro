@@ -175,7 +175,7 @@ const PersonalSetting: React.FC = () => {
           </View>
         </View>
       </View>
-      <Button onClick={handleSave}>保存</Button>
+      <Button onClick={handleSave} className={Style.saveBtn}>保存</Button>
     </View>
   );
 };
