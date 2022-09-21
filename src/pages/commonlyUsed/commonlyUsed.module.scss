@@ -55,15 +55,17 @@
                 font-size: 24px;
             }
 
+            &::after {
+                clear: both;
+            }
+
             .right {
                 float: right;
                 margin-left: auto;
                 cursor: pointer;
                 font-size: 32px;
                 color: gray;
-                &::after {
-                    clear: both;
-                }
+
             }
         }
 

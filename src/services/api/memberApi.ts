@@ -41,6 +41,10 @@ export default {
   reqCommentListByArticleId: (params: object) =>
     get(prefix + "/comment/list", params),
 
+  // 获取订阅/粉丝
+  reqSubscribeAll: (params: object) =>
+    get(prefix + "/subscribe/all", params),
+
   // 关注
   reqSaveSubscribe: (params: object) =>
     post(prefix + "/subscribe/save", params),
@@ -68,5 +72,12 @@ export default {
   reqDelComment: (params: object) => post(prefix + "/comment/delete", params),
 
   // 获取通知
-  reqNotifyListByMemberId: (params: object) => get(prefix + "/notify/list", params)
+  reqNotifyListByMemberId: (params: object) =>
+    get(prefix + "/notify/list", params),
+
+  // 修改通知
+  reqUpdateNotify: (params: object) => post(prefix + "/notify/update", params),
+
+  // 删除通知
+  reqDelNotify: (params: object) => post(prefix + "/notify/delete", params)
 };

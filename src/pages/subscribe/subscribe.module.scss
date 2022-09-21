@@ -1,0 +1,81 @@
+.homeContainer {
+    padding: 10px 20px;
+
+    // 导航栏
+    .navBar {
+        display: flex;
+        height: 70px;
+
+        .navItem {
+            background-color: white;
+            height: 60px;
+            line-height: 60px;
+            flex: 1;
+            font-size: 32px;
+            text-align: center;
+        }
+        .active {
+            color: #e98e97;
+            border-bottom: 1px solid #e98e97;
+        }
+    }
+
+    .notifyScroll {
+        height: 100vh;
+
+        .notifyItem {
+            background-color: white;
+            padding-bottom: 20px;
+            border-bottom: 2px #f2eeee solid;
+
+            .detail {
+                display: flex;
+                align-items: center;
+                margin: 20px 0;
+
+
+                image {
+                    @include portrait(80px);
+
+                }
+
+                .infoSection {
+
+                    height: 80px;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    margin: 0 20px;
+
+                    .author {
+                        font-size: 36px;
+                    }
+
+                    .info {
+                        color: #9d9d9d;
+                        font-size: 24px;
+                        max-width: 400px;
+
+                        .overflow {
+                            overflow: hidden;
+                            text-overflow: ellipsis;
+                            white-space: nowrap;
+                        }
+                    }
+                }
+
+                button {
+                    font-size: 32px;
+                    height: 70px;
+                    line-height: 70px;
+                    border-radius: 5px;
+                    @include defaultBtn
+                }
+
+                .activeBtn {
+                    @include activeBtn
+                }
+            }
+        }
+    }
+}

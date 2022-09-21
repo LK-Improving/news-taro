@@ -16,7 +16,7 @@ import ArticleCard from "../../components/articleCard";
 import useStore from "../../store";
 import memberApi from "../../services/api/memberApi";
 
-interface CommonlyUsedType {
+interface NavType {
   title: string;
   value: string;
 }
@@ -25,7 +25,7 @@ interface CommonlyUsedType {
 let isThrottle = false;
 
 // 常用list
-const commonlyUsedList: CommonlyUsedType[] = [
+const NavList: NavType[] = [
   {
     title: "点赞",
     value: "Like"
@@ -89,7 +89,7 @@ const CommonlyUsed: React.FC = () => {
       push();
     }
   }, [page]);
-  const isComment = commonlyUsedList[key].value === "Comment";
+  const isComment = NavList[key].value === "Comment";
   // 设置文章
   const set = async () => {
     if (isComment) {
@@ -127,7 +127,7 @@ const CommonlyUsed: React.FC = () => {
       memberId: memberInfo.memberId || null
     };
 
-    const res = (await memberApi[`req${commonlyUsedList[key].value}Article`](
+    const res = (await memberApi[`req${NavList[key].value}Article`](
       params
     )) as API.ResultType & {
       page: API.PageType & {
@@ -150,7 +150,7 @@ const CommonlyUsed: React.FC = () => {
       memberId: memberInfo.memberId || null
     };
 
-    const res = (await memberApi[`req${commonlyUsedList[key].value}Article`](
+    const res = (await memberApi[`req${NavList[key].value}Article`](
       params
     )) as API.ResultType & {
       page: API.PageType & { list: API.ArticleType[] };
@@ -161,7 +161,7 @@ const CommonlyUsed: React.FC = () => {
     return Promise.reject(res.msg);
   };
 
-  // 切换分类
+  // 切换导航
   const handleChangeKey: EventProps["onClick"] = e => {
     console.log(e);
     setKey(e.currentTarget.dataset.key);
@@ -213,9 +213,9 @@ const CommonlyUsed: React.FC = () => {
         scrollX
         scrollWithAnimation
         enableFlex
-        scrollIntoView={"nav" + key}
+        scrollIntoView={key+''}
       >
-        {commonlyUsedList.map((item, index) => {
+        {NavList.map((item, index) => {
           return (
             <View
               key={item.value}

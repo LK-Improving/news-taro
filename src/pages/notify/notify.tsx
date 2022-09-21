@@ -15,15 +15,12 @@ import Style from "./notify.module.scss";
 import useStore from "../../store";
 import memberApi from "../../services/api/memberApi";
 
-
 // 节流
 let isThrottle = false;
 
 const Notify: React.FC = () => {
-
-
   // 通知LIst
-  const [notifyList, setnotifyList] = useState<API.ArticleType[]>([]);
+  const [notifyList, setnotifyList] = useState<API.NotifyType[]>([]);
 
   // 当前页码
   const [page, setPage] = useState<number>(1);
@@ -34,14 +31,12 @@ const Notify: React.FC = () => {
   const { MemberStore } = useStore();
 
   // 初始化
-  useEffect(() => {
-    
-  }, []);
+  useEffect(() => {}, []);
   // 监听页码
   useEffect(() => {
     if (page === 1) {
-      set()
-    } else{
+      set();
+    } else {
       push();
     }
   }, [page]);
@@ -49,10 +44,10 @@ const Notify: React.FC = () => {
   // 设置文章
   const set = async () => {
     const res = await getNotiftList();
-    // setArticleList(res.list);
+    setnotifyList(res.list);
     console.log(res);
-    
-    // setTotalPage(res.totalPage);
+
+    setTotalPage(res.totalPage);
   };
 
   // 合并文章
@@ -65,7 +60,7 @@ const Notify: React.FC = () => {
 
   // 获取通知
   const getNotiftList = async (): Promise<API.PageType & {
-    list: API.ArticleType;
+    list: API.NotifyType[];
   }> => {
     const params = {
       page,
@@ -75,15 +70,54 @@ const Notify: React.FC = () => {
     const res = (await memberApi.reqNotifyListByMemberId(
       params
     )) as API.ResultType & {
-      page: API.PageType & { list: API.ArticleType };
+      page: API.PageType & { list: API.NotifyType[] };
     };
-    console.log(res);
     if (res && res.code === 0) {
       return Promise.resolve(res.page);
     }
     return Promise.reject(res.msg);
   };
 
+  // 已读消息
+  const readNotify: Function = async (id: string) => {
+    const params = {
+      id,
+      status: 1
+    };
+    const res = await memberApi.reqUpdateNotify(params);
+    if (res && res.code === 0) {
+      console.log("已读");
+      setnotifyList(
+        notifyList.map(item => {
+          if (item.id === id) {
+            item.status = 1;
+          }
+          return item;
+        })
+      );
+    }
+  };
+
+  // 删除通知
+  const handleDelNotify: EventProps["onClick"] = e => {
+    Taro.showModal({
+      title: "提示",
+      content: "真的要删除该条通知吗！",
+      success: async res => {
+        if (res.confirm) {
+          const resp = await memberApi.reqDelNotify([e.currentTarget.id]);
+          if (resp && resp.code === 0) {
+            setnotifyList(
+              notifyList.filter(item => item.id !== e.currentTarget.id)
+            );
+            Taro.showToast({
+              title: "删除成功！"
+            });
+          }
+        }
+      }
+    });
+  };
 
   // 滚动至底部添加下一页文章
   const handleScrollToLower: ScrollViewProps["onScrollToLower"] = () => {
@@ -103,7 +137,6 @@ const Notify: React.FC = () => {
     }
   };
 
-
   // 跳转页面
   const to = (url: string) => {
     Taro.navigateTo({
@@ -113,33 +146,10 @@ const Notify: React.FC = () => {
 
   return (
     <View className={Style.homeContainer}>
-      {/* 搜索栏 */}
-      <View className={Style.serach}>
-        <View
-          className={Style.imput}
-          onClick={() => to("/pages/search/search")}
-        >
-          <Text
-            className="iconfont icon-sousuo"
-            style={{ fontSize: "40rpx" }}
-          ></Text>
-          <Input
-            placeholder="搜索喜欢的新闻吧！"
-            placeholderStyle="font-size:32rpx"
-          />
-        </View>
-        <Text
-          className={"iconfont icon-plus " + Style.iconfont}
-          onClick={() => to("/pages/publish/publish")}
-        >
-          发布
-        </Text>
-      </View>
-
-      {/* 文章 */}
+      {/* 通知 */}
       {notifyList.length > 0 ? (
         <ScrollView
-          className={Style.articleScroll}
+          className={Style.notifyScroll}
           scrollY
           scrollWithAnimation
           enableFlex
@@ -147,10 +157,41 @@ const Notify: React.FC = () => {
           enable-back-to-top
           refresher-enabled
           onScrollToLower={handleScrollToLower}
-
         >
           {notifyList.map(item => {
-            return 123;
+            return (
+              <View
+                className={Style.notifyItem}
+                key={item.id}
+                onClick={() => {
+                  if (!item.status) {
+                    readNotify(item.id);
+                  }
+                  to(
+                    "/pages/articleDetail/articleDetail?articleId=" +
+                      item.articleId
+                  );
+                }}
+              >
+                <View className={Style.detail}>
+                  <Image src={item.subscribeInfo.portrait}></Image>
+                  {!item.status && <View className={Style.tag}></View>}
+                  <View className={Style.infoSection}>
+                    <View className={Style.author}>
+                      {item.subscribeInfo.nickname}
+                    </View>
+                    <View className={Style.info}>
+                      <Text style={{ marginRight: 20 }}>{item.createTime}</Text>
+                      {/* {'来自' + articleDetail.city} */}
+                    </View>
+                  </View>
+                  <View onClick={handleDelNotify} id={item.id} className={Style.del}>
+                    删除
+                  </View>
+                </View>
+                <View>{item.content}</View>
+              </View>
+            );
           })}
         </ScrollView>
       ) : (

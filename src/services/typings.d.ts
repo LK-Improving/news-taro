@@ -28,7 +28,7 @@ declare namespace API {
     catId: number;
     catName: string;
   }
-  
+
   // 文章图片
   interface CoverType {
     articleId: number;
@@ -56,7 +56,7 @@ declare namespace API {
     likeCount: number;
     collectionCount: number;
     commentCount: number;
-    isSubscribe:number;
+    isSubscribe: number;
   }
   // 分页
   interface PageType {
@@ -74,5 +74,16 @@ declare namespace API {
     createTime: string;
     member: MemberYype;
     memberId: string;
+  }
+  // 通知
+  interface NotifyType {
+    articleId: string;
+    createTime: string;
+    content: string;
+    id: string;
+    memberId: string;
+    status: number;
+    subscribeId: string;
+    subscribeInfo: MemberYype;
   }
 }

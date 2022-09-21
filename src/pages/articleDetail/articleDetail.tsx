@@ -20,7 +20,7 @@ import arcImag from "../../assets/images/arc.png";
 import articleApi from "../../services/api/articleApi";
 import memberApi from "../../services/api/memberApi";
 import useStore from "../../store";
-import { debounce, throllte } from "../..//utils";
+import { debounce, throllte } from "../../utils";
 
 const ArticleDetail: React.FC = () => {
   // 文章详情
@@ -378,6 +378,7 @@ const ArticleDetail: React.FC = () => {
       }
     });
   };
+
   return (
     <View className={Style.articleDetailContainer}>
       {/* 封面 */}
@@ -418,18 +419,17 @@ const ArticleDetail: React.FC = () => {
               </View>
             </View>
             {MemberStore.memberInfo.memberId &&
-            articleDetail.authorId !== MemberStore.memberInfo.memberId ? (
-              articleDetail.isSubscribe === 0 ? (
-                <Button onClick={throllte(handleSubscribe, 500)}>关注</Button>
-              ) : (
-                <Button
-                  onClick={throllte(handlCanelSubscribe, 500)}
-                  className={Style.activeBtn}
-                >
-                  已关注
-                </Button>
-              )
-            ) : null}
+            articleDetail.authorId !== MemberStore.memberInfo.memberId &&
+            articleDetail.isSubscribe === 0 ? (
+              <Button onClick={throllte(handleSubscribe, 500)}>关注</Button>
+            ) : (
+              <Button
+                onClick={throllte(handlCanelSubscribe, 500)}
+                className={Style.activeBtn}
+              >
+                已关注
+              </Button>
+            )}
           </View>
         </View>
         {/* 文章内容 */}

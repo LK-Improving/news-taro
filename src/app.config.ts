@@ -1,13 +1,12 @@
 export default defineAppConfig({
   pages: [
+    'pages/subscribe/subscribe',
     'pages/notify/notify',
     'pages/commonlyUsed/commonlyUsed',
     'pages/my/my',
     'pages/personalSetting/personalSetting',
     'pages/home/home',
     'pages/publish/publish',
-    
-   
     'pages/register/register',
     'pages/mobxDemo/mobxDemo',
     
