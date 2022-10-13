@@ -1,12 +1,14 @@
-.publishContainer{
+.publishContainer {
     padding: 20px;
-    .Block{
+
+    .Block {
         border-bottom: 1px solid #EDEDED;
         margin-bottom: 40px;
         font-size: 32px;
     }
+
     // 编辑器工具栏
-    .editorToolbox{
+    .editorToolbox {
         position: fixed;
         top: 0;
         left: 0;
@@ -17,19 +19,22 @@
         padding: 5px;
         box-sizing: border-box;
         line-height: 1.6;
-        .toolIconfont{
+
+        .toolIconfont {
             font-size: 40px;
             color: #e98e97;
             text-align: center;
             flex: 1;
         }
     }
+
     // 富文本编辑器
-    .categoryGroup{
+    .categoryGroup {
         display: flex;
         flex-wrap: wrap;
         margin-bottom: 30px;
-        .radio{
+
+        .radio {
             min-width: 15%;
             text-align: center;
             font-size: 40px;
@@ -38,25 +43,92 @@
             margin-right: 30px;
             @include defaultBtn();
         }
-        .active{
+
+        .active {
             @include activeBtn();
         }
     }
-    .coverList{
+
+    /* 模态框 */
+    .modal {
+        position: fixed;
+        top: 50%;
+        left: 16px;
+        right: 16px;
+        background-color: #fff;
+        border-radius: 12px;
+        transform: translateY(-50%);
+        z-index: 100;
+
+        .modalTitle {
+            padding: 32px 24px 16px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .modalInput {
+            display: block;
+            padding: 5px;
+            margin: 0 24px 32px 24px;
+            font-size: 32px;
+            border: 1px solid #dfe2e5;
+        }
+
+        .modalFoot {
+            display: flex;
+            line-height: 80px;
+            font-weight: 700;
+            border-top: 1px solid rgba(0, 0, 0, .1);
+        }
+
+        .modalButton {
+            flex: 1;
+            text-align: center;
+        }
+    }
+
+    /* 蒙版 */
+    .mask {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background-color: black;
+        opacity: 0.5;
+        z-index: 99;
+    }
+
+    .coverList {
         display: flex;
-        .cover{
+
+        .cover {
+            position: relative;
             width: 30%;
             height: 250px;
             background-color: #d7d7d7;
             display: flex;
             margin: 20px 0;
             margin-right: 20px;
-            Text{
+
+            .delBtn {
+                // font-size: 32px;
+                color: #d7d7d7;
+                position: absolute;
+                right: calc((100% - 60rpx) / 2);
+                bottom: 50px;
+                padding: 10px;
+                background-color: black;
+                border-radius: 60px;
+            }
+
+            Text {
                 margin: auto;
                 font-size: 60px;
             }
         }
     }
+
     // 预览
     .contentItem {
         height: 180px;
@@ -64,16 +136,20 @@
         display: flex;
         border-bottom: 1px solid #d7d7d7;
     }
-    .buttonGroup{
+
+    .buttonGroup {
         display: flex;
         justify-content: space-around;
-        button{
+
+        button {
             font-size: 32px
         }
-        .publishBtn{
+
+        .publishBtn {
             @include activeBtn();
         }
-        .draftBtn{
+
+        .draftBtn {
             @include defaultBtn();
         }
     }

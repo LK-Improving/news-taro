@@ -11,7 +11,7 @@ declare namespace API {
     city: string;
     createTime: string;
     expiresIn: string;
-    gender: string;
+    gender: number;
     memberId: string;
     mobile: string;
     nickname: string;
@@ -49,13 +49,15 @@ declare namespace API {
     isAudit: number;
     member: Partial<MemberYype>;
     publishTime: string;
-    readCount: number;
-    tag: string[] | null;
+    readCount: string;
+    remark: string | null;
     title: string;
     userId: number;
     likeCount: number;
     collectionCount: number;
     commentCount: number;
+    isLike: number;
+    isCollection: number;
     isSubscribe: number;
   }
   // 分页
@@ -85,5 +87,19 @@ declare namespace API {
     status: number;
     subscribeId: string;
     subscribeInfo: MemberYype;
+  }
+  // 统计数
+  interface StatisticsType {
+    fans: number;
+    likeCount: number;
+    publishCount: number;
+    subscribeCount: number;
+  }
+
+  //模态框
+  interface ModalType {
+    title: string;
+    value: string;
+    errMsg: string;
   }
 }

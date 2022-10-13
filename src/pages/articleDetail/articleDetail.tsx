@@ -24,37 +24,13 @@ import { debounce, throllte } from "../../utils";
 
 const ArticleDetail: React.FC = () => {
   // 文章详情
-  const [articleDetail, setArticleDetail] = useState<Partial<API.ArticleType>>({
-    articleId: 1741828224670735,
-    authorId: 1563343744953057300,
-    catName: "财经",
-    content: "",
-    coverList: [
-      {
-        articleId: 1741828224670735,
-        defaultImg: 0,
-        id: 461,
-        imgName: "tos-cn-i-qvj2lq49k0/93557ac3c735433d965bb6ef25919442",
-        imgSort: 0,
-        imgUrl:
-          "http://p3-sign.toutiaoimg.com/tos-cn-i-qvj2lq49k0/93557ac3c735433d965bb6ef25919442~tplv-tt-post:400:400.jpeg?from=post&x-expires=1668960000&x-signature=g5STBTwDRQVjSPs0cFm7p305%2F7c%3D"
-      }
-    ],
-    createTime: "2022-08-22 10:56:20",
-    isAudit: 1,
-    member: {},
-    publishTime: "2022-08-22 10:56:20",
-    readCount: 12058406,
-    tag: null,
-    title: "",
-    userId: 1,
-    likeCount: 0,
-    collectionCount: 0,
-    commentCount: 0
-  });
+  const [articleDetail, setArticleDetail] = useState<Partial<API.ArticleType>>(
+    {}
+  );
   // 获取页面实例
   const instance = getCurrentInstance();
-  // 评论
+
+  // 评论内容
   const [comment, setComment] = useState<string>("");
 
   // 评论列表
@@ -95,7 +71,9 @@ const ArticleDetail: React.FC = () => {
     firstCollectionState: false
   });
 
-  const { MemberStore } = useStore();
+  const {
+    MemberStore: { memberInfo }
+  } = useStore();
 
   let startY = 0; // 手指起始的坐标
   let moveY = 0; // 手指移动的坐标
@@ -103,7 +81,7 @@ const ArticleDetail: React.FC = () => {
 
   const showConfirmBar = false;
 
-  const articleId = instance.router?.params.articleId!;
+  const articleId = instance.router?.params.articleId || "";
 
   // 初始化
   useEffect(() => {
@@ -130,9 +108,11 @@ const ArticleDetail: React.FC = () => {
 
   // 监听页码
   useEffect(() => {
-    if (page > 1) {
+    if (page && page > 1) {
       push();
       setIsThrottle(false);
+    } else{
+      set()
     }
   }, [page]);
 
@@ -170,20 +150,41 @@ const ArticleDetail: React.FC = () => {
     }
   };
 
+  // 添加历史记录
+  const saveHistory: Function = async () => {
+    if (memberInfo.memberId) {
+      const params = {
+        articleId,
+        memberId: memberInfo.memberId
+      };
+      const res = await memberApi.reqSaveHistory(params);
+      if (res && res.code === 0) {
+        console.log(1);
+      }
+    }
+  };
+
   // 初始化
   const init = async () => {
+    // 获取文章详情
     getArticleDetail();
+    // 新增历史记录
+    saveHistory();
+    if (memberInfo.memberId) {
+      // const params = {
+      //   articleId,
+      //   memberId: memberInfo.memberId
+      // };
+      // queryIsLike(params);
+      // queryIsCollection(params);
+    }
+  };
+
+  // 设置评论
+  const set = async () => {
     const res = await getCommentList();
     setCommentList(res.list);
     setTotalPage(res.totalPage);
-    if (MemberStore.memberInfo.memberId) {
-      const params = {
-        articleId,
-        memberId: MemberStore.memberInfo.memberId
-      };
-      queryIsLike(params);
-      queryIsCollection(params);
-    }
   };
 
   // 合并评论
@@ -196,13 +197,17 @@ const ArticleDetail: React.FC = () => {
   const getArticleDetail = async () => {
     const params = {
       articleId,
-      memberId: MemberStore.memberInfo.memberId || null
+      memberId: memberInfo.memberId || null
     };
     const res = (await articleApi.reqArticleInfo(params)) as API.ResultType & {
       article: API.ArticleType;
     };
     if (res && res.code === 0) {
       setArticleDetail(res.article);
+      setIsLike(!!res.article.isLike);
+      setIsCollection(!!res.article.isCollection);
+      stateRef.current.firstLikeState = !!res.article.isLike;
+      stateRef.current.firstCollectionState = !!res.article.isCollection;
     }
   };
 
@@ -256,23 +261,35 @@ const ArticleDetail: React.FC = () => {
 
   // 点赞/取消点赞
   const handleLike: EventProps["onClick"] = () => {
-    if (!MemberStore.memberInfo.memberId) {
+    if (!memberInfo.memberId) {
       return Taro.showToast({
         title: "请登陆后再操作！",
         icon: "error"
       });
     }
+
+    let count = articleDetail.likeCount!;
+    setArticleDetail({
+      ...articleDetail,
+      likeCount: !isLike ? count + 1 : count - 1
+    });
     setIsLike(!isLike);
   };
 
   // 收藏/取消收藏
   const handleCollection: EventProps["onClick"] = () => {
-    if (!MemberStore.memberInfo.memberId) {
+    if (!memberInfo.memberId) {
       return Taro.showToast({
         title: "请登陆后再操作！",
         icon: "error"
       });
     }
+
+    let count = articleDetail.collectionCount!;
+    setArticleDetail({
+      ...articleDetail,
+      collectionCount: !isCollection ? count + 1 : count - 1
+    });
     setIsCollection(!isCollection);
     if (!isCollection) {
       Taro.showToast({
@@ -297,7 +314,7 @@ const ArticleDetail: React.FC = () => {
   const isLikeArticle = () => {
     const params = {
       articleId,
-      memberId: MemberStore.memberInfo.memberId
+      memberId: memberInfo.memberId
     };
     if (stateRef.current.likeState) {
       memberApi.reqSaveLike(params);
@@ -310,7 +327,7 @@ const ArticleDetail: React.FC = () => {
   const isCollectionArticle = () => {
     const params = {
       articleId,
-      memberId: MemberStore.memberInfo.memberId
+      memberId: memberInfo.memberId
     };
     if (stateRef.current.collectionState) {
       memberApi.reqSaveCollection(params);
@@ -323,15 +340,20 @@ const ArticleDetail: React.FC = () => {
     console.log(comment);
     const params = {
       articleId,
-      memberId: MemberStore.memberInfo.memberId,
+      memberId: memberInfo.memberId,
       content: comment
     };
     const res = await memberApi.reqSaveComment(params);
     if (res && res.code === 0) {
+      setPage(1);
+      setComment("");
+      setArticleDetail({
+        ...articleDetail,
+        commentCount: articleDetail.commentCount! + 1
+      });
       Taro.showToast({
         icon: "success",
-        title: "评论成功",
-        success: getCommentList
+        title: "评论成功"
       });
     }
   };
@@ -351,7 +373,7 @@ const ArticleDetail: React.FC = () => {
   const handleSubscribe: EventProps["onClick"] = async () => {
     const params = {
       subscribeId: articleDetail.member?.memberId,
-      memberId: MemberStore.memberInfo.memberId
+      memberId: memberInfo.memberId
     };
     const res = await memberApi.reqSaveSubscribe(params);
     if (res && res.code === 0) {
@@ -368,7 +390,7 @@ const ArticleDetail: React.FC = () => {
         if (res2.confirm) {
           const params = {
             subscribe_id: articleDetail.member?.memberId,
-            member_id: MemberStore.memberInfo.memberId
+            member_id: memberInfo.memberId
           };
           const res = await memberApi.reqCanelSubscribe(params);
           if (res && res.code === 0) {
@@ -379,7 +401,14 @@ const ArticleDetail: React.FC = () => {
     });
   };
 
-  return (
+  // 跳转页面
+  const to = (url: string) => {
+    Taro.navigateTo({
+      url: url
+    });
+  };
+
+  return articleDetail.articleId ? (
     <View className={Style.articleDetailContainer}>
       {/* 封面 */}
       <Swiper className={Style.coverSwiper}>
@@ -406,7 +435,7 @@ const ArticleDetail: React.FC = () => {
           <Image className={Style.arc} src={arcImag}></Image>
           <View className={Style.title}>{articleDetail.title}</View>
           <View className={Style.detail}>
-            <Image src={articleDetail.member!.portrait!} />
+            <Image src={articleDetail.member!.portrait!} onClick={()=> to("/pages/creation/creation?memberId=" + articleDetail.authorId)} />
             <View className={Style.infoSection}>
               <View className={Style.author}>
                 {articleDetail.member!.nickname}
@@ -418,8 +447,8 @@ const ArticleDetail: React.FC = () => {
                 {/* {'来自' + articleDetail.city} */}
               </View>
             </View>
-            {MemberStore.memberInfo.memberId &&
-            articleDetail.authorId !== MemberStore.memberInfo.memberId &&
+            {memberInfo.memberId &&
+            articleDetail.authorId !== memberInfo.memberId &&
             articleDetail.isSubscribe === 0 ? (
               <Button onClick={throllte(handleSubscribe, 500)}>关注</Button>
             ) : (
@@ -473,7 +502,7 @@ const ArticleDetail: React.FC = () => {
                 {/* 评论头部 */}
                 <View className={Style.commentHeader}>
                   {/* 头像 */}
-                  <Image src={item.member.portrait} />
+                  <Image src={item.member.portrait} onClick={()=> to("/pages/creation/creation?memberId=" + articleDetail.authorId)} />
                   <View className={Style.commentInfo}>
                     <View className={Style.nickName}>
                       {item.member.nickname}
@@ -500,13 +529,13 @@ const ArticleDetail: React.FC = () => {
           <Block>
             <View
               className={Style.white}
-              onClick={() => (MemberStore.memberInfo ? setVisible(true) : null)}
+              onClick={() => (memberInfo ? setVisible(true) : null)}
             >
               <Text
                 className="iconfont icon-shuru"
                 style={{ fontSize: "32rpx" }}
               ></Text>
-              {MemberStore.memberInfo ? (
+              {memberInfo ? (
                 <Text>&nbsp;写评论···</Text>
               ) : (
                 <Text>&nbsp;登陆后才能评论</Text>
@@ -574,7 +603,7 @@ const ArticleDetail: React.FC = () => {
         )}
       </View>
     </View>
-  );
+  ) : null;
 };
 
 export default observer(ArticleDetail);

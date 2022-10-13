@@ -10,6 +10,7 @@ import {
   ScrollViewProps
 } from "@tarojs/components";
 import Taro from "@tarojs/taro";
+import VirtualList from "@tarojs/components/virtual-list";
 import Style from "./home.module.scss";
 import articleApi from "../../services/api/articleApi";
 import ArticleCard from "../../components/articleCard";
@@ -18,10 +19,60 @@ import useStore from "../../store";
 // 节流
 let isThrottle = false;
 
+// 虚拟列表
+// const virList = () => (
+//   <VirtualList
+//     height={380} /* 列表的高度 */
+//     width="100%" /* 列表的宽度 */
+//     itemData={articleList} /* 渲染列表的数据 */
+//     itemCount={articleList.length} /*  渲染列表的长度 */
+//     itemSize={220} /* 列表单项的高度  */
+//     onScroll={({ scrollDirection, scrollOffset }) => {
+//       console.log(scrollOffset);
+
+//       if (
+//         // 避免重复加载数据
+//         !isThrottle &&
+//         // 只有往前滚动我们才触发
+//         scrollDirection === "forward" &&
+//         // 5 = (列表高度 / 单项列表高度)
+//         // 100 = 滚动提前加载量，可根据样式情况调整
+//         scrollOffset > (articleList.length - 360 / 220) * 220
+//       ) {
+//         handleScrollToLower();
+//         console.log(articleList);
+//       }
+//     }}
+//   >
+//     {Row}
+//   </VirtualList>
+// );
+
+// const Row = React.memo(
+//   ({
+//     id,
+//     index,
+//     style,
+//     data
+//   }: {
+//     id: string;
+//     index: number;
+//     style: React.CSSProperties;
+//     data: API.ArticleType[];
+//   }) => {
+//     return (
+//       <View id={id} style={style}>
+//         <ArticleCard article={data[index]} />
+//       </View>
+//     );
+//   }
+// );
+
 const Home: React.FC = () => {
   // 当前分类
   const [key, setKey] = useState<number>(0);
-  // 当前分类
+
+  // 下拉刷新
   const [isRefreesh, setIsRefreesh] = useState<boolean>(false);
 
   // 分类LIst
@@ -42,11 +93,13 @@ const Home: React.FC = () => {
   useEffect(() => {
     getCategoryList();
   }, []);
+
   // 监听分类
   useEffect(() => {
     set();
     setPage(1);
   }, [key]);
+
   // 监听页码
   useEffect(() => {
     if (page > 1) {
@@ -110,14 +163,14 @@ const Home: React.FC = () => {
   };
 
   // 滚动至底部添加下一页文章
-  const handleScrollToLower: ScrollViewProps["onScrollToLower"] = () => {
+  const handleScrollToLower = () => {
     let currentPAge = page;
     if (currentPAge === totalPage) {
       return;
     }
     if (!isThrottle) {
       Taro.showLoading({
-        title: "正在u加载数据!",
+        title: "正在加载数据!",
         mask: true
       });
       isThrottle = true;
@@ -148,6 +201,19 @@ const Home: React.FC = () => {
     Taro.navigateTo({
       url: url
     });
+    // 更新阅读量
+    if (url.substring(0, 20) === "/pages/articleDetail") {
+      setArticleList(
+        articleList.map(item => {
+          if (item.articleId === url.substring(45)) {
+            console.log(typeof item.readCount);
+
+            item.readCount = (parseInt(item.readCount) + 1).toString();
+          }
+          return item;
+        })
+      );
+    }
   };
   return (
     <View className={Style.homeContainer}>
@@ -208,6 +274,7 @@ const Home: React.FC = () => {
         })}
       </ScrollView>
       {/* 文章 */}
+
       {articleList.length > 0 ? (
         <ScrollView
           className={Style.articleScroll}
@@ -222,7 +289,14 @@ const Home: React.FC = () => {
           refresherTriggered={isRefreesh}
         >
           {articleList.map(item => {
-            return <ArticleCard key={item.articleId} article={item} to={to} />;
+            return (
+              <ArticleCard
+                headerTo={to}
+                key={item.articleId}
+                article={item}
+                to={to}
+              />
+            );
           })}
         </ScrollView>
       ) : (

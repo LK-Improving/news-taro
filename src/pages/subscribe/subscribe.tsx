@@ -9,7 +9,7 @@ import {
   Image,
   ScrollViewProps
 } from "@tarojs/components";
-import Taro from "@tarojs/taro";
+import Taro, { getCurrentInstance } from "@tarojs/taro";
 import { observer } from "mobx-react-lite";
 import Style from "./subscribe.module.scss";
 import useStore from "../../store";
@@ -37,6 +37,7 @@ const NavList: NavType[] = [
 ];
 
 const Notify: React.FC = () => {
+  
   // 通知LIst
   const [subscribeList, setsubscribeList] = useState<API.NotifyType[]>([]);
 
@@ -45,7 +46,21 @@ const Notify: React.FC = () => {
 
   const { MemberStore } = useStore();
 
+  // 获取页面实例
+  const instance = getCurrentInstance();
+
+  const param = instance.router?.params!;
+
   // 初始化
+  useEffect(() => {
+    if (param.key) {
+      setKey(parseInt(param.key));
+    } else {
+      Taro.navigateBack();
+    }
+  }, []);
+
+  // 监听key
   useEffect(() => {
     getsubscribeList();
   }, [key]);
@@ -53,7 +68,8 @@ const Notify: React.FC = () => {
   // 获取订阅
   const getsubscribeList = async () => {
     const params = {
-      [NavList[key].value]: MemberStore.memberInfo.memberId || null
+      key,
+      [NavList[key].value]: MemberStore.memberInfo.memberId
     };
     const res = (await memberApi.reqSubscribeAll(params)) as API.ResultType & {
       list: API.NotifyType[];
@@ -63,7 +79,7 @@ const Notify: React.FC = () => {
         res.list.map(item => {
           if (item.memberId === MemberStore.memberInfo.memberId) {
             item.status = 1;
-          } else{
+          } else {
             item.status = 0;
           }
           return item;
@@ -164,7 +180,7 @@ const Notify: React.FC = () => {
         >
           {subscribeList.map(item => {
             return (
-              <View className={Style.notifyItem} key={item.id}>
+              <View className={Style.notifyItem} key={item.id} id={item.subscribeInfo.memberId} onClick={e=>to("/pages/creation/creation?memberId=" + e.currentTarget.id)}>
                 <View className={Style.detail}>
                   <Image src={item.subscribeInfo.portrait}></Image>
                   <View className={Style.infoSection}>

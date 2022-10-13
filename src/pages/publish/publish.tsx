@@ -7,7 +7,9 @@ import {
   Block,
   Image,
   Button,
-  EventProps
+  EventProps,
+  Input,
+  InputProps
 } from "@tarojs/components";
 import Taro, { getCurrentInstance } from "@tarojs/taro";
 import { observer } from "mobx-react-lite";
@@ -15,7 +17,7 @@ import Style from "./publish.module.scss";
 import articleApi from "../../services/api/articleApi";
 import ArticleCard from "../../components/articleCard";
 import useStore from "../../store";
-import { uploadFile } from "../../utils/request";
+import uploadApi from "../../services/api/uploadApi";
 
 interface CtxType {
   clear: Function;
@@ -33,6 +35,10 @@ interface CtxType {
   undo: Function;
   getSrc: Function;
   getRect: Function;
+  callback: {
+    resolve: any;
+    reject: any;
+  };
 }
 
 interface RectType {
@@ -46,37 +52,17 @@ interface RectType {
   width: number;
 }
 
+interface UploadType {
+  url: string; // 文件路径
+  hash: string; // 用于删除图片
+}
+
 interface FormType {
   title: string;
   content: string;
   category: number[];
   coverList: Partial<API.CoverType>[];
   userID?: string;
-}
-
-// 上传图片方法
-function upload(src, type) {
-  return new Promise((resolve, reject) => {
-    console.log("上传", type === "img" ? "图片" : "视频", "：", src);
-    resolve(src);
-    /*
-    // 实际使用时，上传到服务器
-    Taro.uploadFile({
-      url: 'xxx', // 接口地址
-      filePath: src,
-      name: 'xxx',
-      success(res) {
-        resolve(res.data.path) // 返回线上地址
-      },
-      fail: reject
-    })
-    */
-  });
-}
-// 删除图片方法
-function remove(src) {
-  console.log("删除图片：", src);
-  // 实际使用时，删除线上资源
 }
 
 const Publish: React.FC = () => {
@@ -89,16 +75,13 @@ const Publish: React.FC = () => {
   const [formData, setFormData] = useState<FormType>({
     title: "",
     content: "",
-    category: [1, 2, 3],
-    coverList: [
-      {
-        imgName: "test",
-        imgUrl: "https://s2.loli.net/2022/09/07/o8uCN2n7Btwfxip.png"
-      }
-    ]
+    category: [],
+    coverList: []
   });
 
-  const [modal, setModal] = useState<any>();
+  const [uploadList, setUploadList] = useState<UploadType[]>([]);
+
+  const [modal, setModal] = useState<Partial<API.ModalType> | null>(null);
 
   // 获取页面实例
   const { page } = getCurrentInstance();
@@ -110,6 +93,23 @@ const Publish: React.FC = () => {
   const { MemberStore } = useStore();
 
   useEffect(() => {
+    if (!MemberStore.memberInfo.memberId) {
+      Taro.showToast({
+        title: "您还未登录！",
+        icon: "error",
+        success: () => {
+          Taro.navigateTo({
+            url: "pages/pages/register"
+          });
+        }
+      });
+    }
+    initEditor();
+    getCategoryList();
+  }, []);
+
+  // 初始化编辑器
+  const initEditor = () => {
     let article = page?.selectComponent!("#article") as CtxType;
     /**
      * @description 设置获取链接的方法
@@ -134,21 +134,18 @@ const Publish: React.FC = () => {
                 if (type === "img") {
                   Taro.chooseImage({
                     count: value === undefined ? 9 : 1, // 2.2.0 版本起插入图片时支持多张（修改图片链接时仅限一张）
-                    success: res => {
-                      if (res.tempFilePaths.length == 1 && Taro.editImage) {
+                    success: res2 => {
+                      if (res2.tempFilePaths.length == 1 && Taro.editImage) {
                         // 单张图片时进行编辑
                         Taro.editImage({
-                          src: res.tempFilePaths[0],
-                          complete: res2 => {
+                          src: res2.tempFilePaths[0],
+                          complete: res3 => {
                             Taro.showLoading({
                               title: "上传中"
                             });
-                            upload(
-                              res2.tempFilePath || res.tempFilePaths[0],
-                              type
-                            ).then(res => {
+                            upload(res3.tempFilePath!, type).then(res4 => {
                               Taro.hideLoading();
-                              resolve(res);
+                              resolve(res4);
                             });
                           }
                         });
@@ -158,16 +155,16 @@ const Publish: React.FC = () => {
                           title: "上传中"
                         });
                         (async () => {
-                          const arr = [];
-                          for (let item of res.tempFilePaths) {
+                          const arr: string[] = [];
+                          for (let item of res2.tempFilePaths) {
                             // 依次上传
-                            const src = await upload(item, type);
+                            const src: string = await upload(item, type);
                             arr.push(src);
                           }
                           return arr;
-                        })().then(res => {
+                        })().then(res3 => {
                           Taro.hideLoading();
-                          resolve(res);
+                          resolve(res3);
                         });
                       }
                     },
@@ -175,13 +172,13 @@ const Publish: React.FC = () => {
                   });
                 } else {
                   Taro.chooseVideo({
-                    success: res => {
+                    success: res2 => {
                       Taro.showLoading({
                         title: "上传中"
                       });
-                      upload(res.tempFilePath, type).then(res => {
+                      upload(res2.tempFilePath, type).then(res3 => {
                         Taro.hideLoading();
-                        resolve(res);
+                        resolve(res3);
                       });
                     },
                     fail: reject
@@ -189,10 +186,10 @@ const Publish: React.FC = () => {
                 }
               } else {
                 // 远程链接
-                // callback = {
-                //   resolve,
-                //   reject
-                // }
+                article.callback = {
+                  resolve,
+                  reject
+                };
                 setModal({
                   title: (type === "img" ? "图片" : "视频") + "链接",
                   value
@@ -201,16 +198,17 @@ const Publish: React.FC = () => {
             }
           });
         } else {
-          // this.callback = {
-          //   resolve,
-          //   reject
-          // }
+          article.callback = {
+            resolve,
+            reject
+          };
           let title;
           if (type === "audio") {
             title = "音频链接";
           } else if (type === "link") {
             title = "链接地址";
           }
+
           setModal({
             title,
             value
@@ -219,23 +217,70 @@ const Publish: React.FC = () => {
       });
     };
     setCtx(article);
-    getCategoryList();
-  }, []);
+  };
 
-  // 获取分类
-  const getCategoryList = async () => {
-    const res = (await articleApi.reqArticleCtaegory()) as API.ResultType & {
-      categoryList: API.CategoryType[];
-    };
-    if (res && res.code === 0) {
-      setCategoryList(res.categoryList);
+  // 上传图片方法
+  function upload(src, type) {
+    return new Promise<string>(async (resolve, reject) => {
+      console.log("上传", type === "img" ? "图片" : "视频", "：", src);
+      // 实际使用时，上传到服务器
+      const res2 = await uploadApi.upload(src);
+      console.log(res2);
+      if (res2.data) {
+        setUploadList(
+          uploadList.concat({
+            url: res2.data.url,
+            hash: res2.data.hash
+          })
+        );
+        resolve(res2.data.url);
+      } else if (res2.code === "image_repeated") {
+        Taro.hideLoading();
+        Taro.showToast({
+          icon: "error",
+          title: "该图片已被上传过！"
+        });
+      }
+    });
+  }
+
+  // 删除图片方法
+  async function remove(src) {
+    console.log("删除图片：", src);
+    const hash = uploadList.find(item => item.url === src.detail.src)?.hash;
+    // 实际使用时，删除线上资源
+    if (hash) {
+      const res = await uploadApi.remove(hash);
+      if (res) {
+        setUploadList(uploadList.filter(item => item.hash !== hash));
+        setFormData({
+          ...formData,
+          coverList: formData.coverList.filter(item => item.imgName !== hash)
+        });
+      }
     }
+  }
+
+  // 处理模态框
+  const modalInput: InputProps["onInput"] = e => {
+    setModal({ ...modal, value: e.detail.value });
+  };
+
+  const modalConfirm = () => {
+    ctx?.callback.resolve(modal!.value || "");
+    setModal(null);
+  };
+
+  const modalCancel = () => {
+    ctx?.callback.reject();
+    setModal(null);
   };
 
   // 调用编辑器接口
   const edit = e => {
     ctx![e]();
   };
+
   // 清空编辑器内容
   const clear = () => {
     Taro.showModal({
@@ -246,6 +291,7 @@ const Publish: React.FC = () => {
       }
     });
   };
+
   // 保存编辑器内容
   const save = () => {
     if (ctx?.getContent() !== "<p></p>") {
@@ -277,12 +323,18 @@ const Publish: React.FC = () => {
     }
   };
 
-  // 草稿
-  const handleDraft: EventProps["onClick"] = e => {
-    console.log(formData);
+  // 获取分类
+  const getCategoryList = async () => {
+    const res = (await articleApi.reqArticleCtaegory()) as API.ResultType & {
+      categoryList: API.CategoryType[];
+    };
+    if (res && res.code === 0) {
+      setCategoryList(res.categoryList);
+    }
   };
-  // 发布
-  const handlePublish: EventProps["onClick"] =async  () => {
+
+  // 发布/草稿
+  const handlePublishOrDraft: EventProps["onClick"] = async e => {
     const { title, content, category, coverList } = formData;
     if (title === "") {
       return Taro.showToast({
@@ -296,7 +348,7 @@ const Publish: React.FC = () => {
         icon: "error"
       });
     }
-    if (category.length < 1) {
+    if (category.length < 1 && e.currentTarget.id === "0") {
       return Taro.showToast({
         title: "请选择文章分类！",
         icon: "error"
@@ -306,10 +358,10 @@ const Publish: React.FC = () => {
       return Taro.showToast({
         title: "您还未登录！",
         icon: "error",
-        success:()=>{
+        success: () => {
           Taro.navigateTo({
-            url: 'pages/pages/register'
-          })
+            url: "pages/pages/register"
+          });
         }
       });
     }
@@ -317,36 +369,83 @@ const Publish: React.FC = () => {
     const params = {
       title,
       content,
-      authorId:MemberStore.memberInfo.memberId,
-      categoryList:category.map(item=>({
-        catId : item
+      authorId: MemberStore.memberInfo.memberId,
+      isAduit: e.currentTarget.id,
+      categoryList: category.map(item => ({
+        catId: item
       })),
       coverList
     };
     console.log(params);
-    const res = await articleApi.reqSaveArticle(params) 
+    const res = await articleApi.reqSaveArticle(params);
     if (res && res.code === 0) {
-      Taro.showToast({
-        title: '发布发表成功，请等待后台审核！',
-        success: ()=>{
-          Taro.navigateBack()
-        }
-      })
+      console.log(res);
+      Taro.navigateBack();
     }
   };
 
-  // 上传图片
-  const handleUpload: EventProps["onClick"] =  e => {
+  // 删除封面
+  const handleRemove: EventProps["onClick"] = e => {
+    console.log(e.currentTarget.dataset.url);
+    Taro.showModal({
+      title: "提示!",
+      content: "您确定要删除该封面吗？",
+      success(result) {
+        if (result.confirm) {
+          remove({detail:{src:e.currentTarget.dataset.url}});
+        }
+      }
+    });
+  };
+
+  // 上传封面
+  const handleUpload: EventProps["onClick"] = e => {
     Taro.chooseMedia({
-      count: 5,
+      count: 3,
       mediaType: ["image"],
       sourceType: ["album", "camera"],
       camera: "back",
-      success: async (res) => {
-        console.log(res.tempFiles[0].tempFilePath);
-        const res2 = await uploadFile(res.tempFiles[0].tempFilePath)
-        console.log(res2);
-        
+      success: async res => {
+        console.log(res.tempFiles.length - formData.coverList.length);
+
+        if (res.tempFiles.length + formData.coverList.length > 3) {
+          return Taro.showToast({
+            title: "最多只可上传三张封面！",
+            icon: "error"
+          });
+        }
+        Taro.showLoading({
+          title: "上传中"
+        });
+        console.log(res.tempFiles);
+        if (res.tempFiles) {
+          for(let item of res.tempFiles){
+            const res2 = await uploadApi.upload(item.tempFilePath);
+            if (res2 && res2.data) {
+              setUploadList(
+                uploadList.concat({
+                  url: res2.data.url,
+                  hash: res2.data.hash
+                })
+              );
+              setFormData({
+                ...formData,
+                coverList: formData.coverList.concat({
+                  imgUrl: res2.data.url,
+                  imgName: res2.data.hash
+                })
+              });
+              console.log(123);
+              
+            } else if (res2.code === "image_repeated") {
+              Taro.showToast({
+                icon: "error",
+                title: "该图片已被上传过！"
+              });
+            }
+          }
+        }
+        Taro.hideLoading();
       }
     });
   };
@@ -355,7 +454,7 @@ const Publish: React.FC = () => {
       className={Style.publishContainer}
       onClick={e => {
         // console.log("container", e);
-        // ctx 为组件实例
+        // ctx 为编辑器实例
         ctx!.getRect!()
           .then((rect: RectType) => {
             // console.log(rect); // boundingClientRect 信息
@@ -445,11 +544,42 @@ const Publish: React.FC = () => {
           content={formData.content}
           placeholder="请输入正文"
           emoji
-          domain="https://mp-html.oss-cn-hangzhou.aliyuncs.com"
+          domain="https://smms.app/api/v2/upload?inajax=1"
           editable
           onRemove={remove}
         />
       </View>
+      {modal && (
+        <Block>
+          <View className={Style.mask} />
+          <View className={Style.modal}>
+            <View className={Style.modalTitle}>{modal.title}</View>
+            <Input
+              className={Style.modalInput}
+              value={modal.value}
+              maxlength={-1}
+              auto-focus
+              onInput={modalInput}
+            />
+            <View className={Style.modalFoot}>
+              <View className={Style.modalButton} onClick={modalCancel}>
+                取消
+              </View>
+              <View
+                className={Style.modalButton}
+                style={{
+                  color: "#576b95",
+                  borderLeft: "1px solid rgba(0,0,0,.1)"
+                }}
+                onClick={modalConfirm}
+              >
+                确定
+              </View>
+            </View>
+          </View>
+        </Block>
+      )}
+
       {/* 分类 */}
       <View className={Style.Block}>
         <View>请选择分类</View>
@@ -477,7 +607,7 @@ const Publish: React.FC = () => {
                       });
                 }}
               >
-                {item.catId}
+                {item.catName}
               </View>
             );
           })}
@@ -489,7 +619,13 @@ const Publish: React.FC = () => {
         <View className={Style.coverList}>
           {formData.coverList?.map((item, index) => {
             return (
-              <Image key={index} className={Style.cover} src={item.imgUrl!} />
+              <Image key={index} className={Style.cover} src={item.imgUrl!}>
+                <Text
+                  className={"iconfont icon-clear " + Style.delBtn}
+                  data-url={item.imgUrl}
+                  onClick={handleRemove}
+                ></Text>
+              </Image>
             );
           })}
           <View className={Style.cover} onClick={handleUpload}>
@@ -515,10 +651,18 @@ const Publish: React.FC = () => {
       {/* 操作按钮 */}
       <View className={Style.Block}>
         <View className={Style.buttonGroup}>
-          <Button className={Style.publishBtn} onClick={handlePublish}>
+          <Button
+            className={Style.publishBtn}
+            id="0"
+            onClick={handlePublishOrDraft}
+          >
             发布
           </Button>
-          <Button className={Style.draftBtn} onClick={handleDraft}>
+          <Button
+            className={Style.draftBtn}
+            id="3"
+            onClick={handlePublishOrDraft}
+          >
             存草稿
           </Button>
         </View>

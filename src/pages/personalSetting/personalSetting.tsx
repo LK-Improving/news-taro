@@ -36,7 +36,6 @@ const PersonalSetting: React.FC = () => {
     //   setMemberInfo(member)
     // }
     if (memberInfo) {
-      console.log(memberInfo);
       setFormData(memberInfo);
     } else {
       Taro.navigateBack();
@@ -67,7 +66,7 @@ const PersonalSetting: React.FC = () => {
   // 修改性别
   const handleChangeGender: PickerSelectorProps["onChange"] = e => {
     console.log(e);
-    setFormData({ ...formData, gender: e.detail.value.toString() });
+    setFormData({ ...formData, gender: parseInt(e.detail.value.toString()) });
   };
   // 修改日期
   const handleChangeDate: PickerDateProps["onChange"] = e => {

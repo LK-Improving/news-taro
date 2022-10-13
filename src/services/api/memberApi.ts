@@ -29,7 +29,7 @@ export default {
   reqSaveCollection: (params: object) =>
     post(prefix + "/collection/save", params),
 
-  // 取消文章
+  // 取消收藏
   reqDelCollection: (params: object) =>
     post(prefix + "/collection/delete", params),
 
@@ -42,8 +42,7 @@ export default {
     get(prefix + "/comment/list", params),
 
   // 获取订阅/粉丝
-  reqSubscribeAll: (params: object) =>
-    get(prefix + "/subscribe/all", params),
+  reqSubscribeAll: (params: object) => get(prefix + "/subscribe/all", params),
 
   // 关注
   reqSaveSubscribe: (params: object) =>
@@ -79,5 +78,32 @@ export default {
   reqUpdateNotify: (params: object) => post(prefix + "/notify/update", params),
 
   // 删除通知
-  reqDelNotify: (params: object) => post(prefix + "/notify/delete", params)
+  reqDelNotify: (params: object) => post(prefix + "/notify/delete", params),
+
+  // 查询是否关注
+  reqSelectSubscribe: (params: object) =>
+    get(prefix + "/subscribe/select", params),
+
+  // 新增历史记录
+  reqSaveHistory: (params: object) => post(prefix + "/history/save", params),
+
+  // 删除历史记录
+  reqDelHistoryByid: (params: object) =>
+    post(prefix + "/history/delete", params),
+
+  // 删除点赞
+  reqDelLikeById: (params: object) => post(prefix + "/like/deletebyid", params),
+
+  // 删除收藏
+  reqDelCollectionById: (params: object) =>
+    post(prefix + "/collection/deletebyid", params),
+
+  // 用户统计数
+  reqStatistics: (value: string) => get(prefix + "/statistics/" + value),
+
+  // 查询用户信息
+  reqMemberInfo: (value: string) => get(prefix + "/info/" + value),
+
+  // 获取用户未读通知数量
+  reqNotifyCount: (value: string) => get(prefix + "/notify/count/" + value)
 };

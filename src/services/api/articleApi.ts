@@ -19,5 +19,11 @@ export default {
   reqHotArticle: (params: object) => get(prefix + "/hot", params),
 
   // 发布文章
-  reqSaveArticle: (params: object) => post(prefix + "/save", params)
+  reqSaveArticle: (params: object) => post(prefix + "/save", params),
+
+  // 用户创作
+  reqCreationList: (params: object) => get(prefix + "/creation/list", params),
+
+  // 删除创作
+  reqDelCreation: (params: object) => post(prefix + "/delete/", params)
 };

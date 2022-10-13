@@ -49,10 +49,10 @@ export const get = (url: string, data?: any) => {
 };
 
 // 上传文件
-export const uploadFile = ( filePath: any) => {
+export const uploadFile = (url:string, filePath: any) => {
   return new Promise<any>((resolve, reject) => {
     Taro.uploadFile({
-      url: 'https://smms.app/api/v2/upload?inajax=1',
+      url,
       header: {
         'content-type': 'application/x-www-form-urlencoded', //修改为formdata数据格式
         'Authorization': 'pLzY2TAkDzLHYqcs4TjcQDXkobmWA6ZE'
@@ -63,8 +63,32 @@ export const uploadFile = ( filePath: any) => {
         'file_id':'0'
       },
       success: (res) => {
+        console.log(res);
+        
         if (res && res.data) {
-          resolve(res);
+          resolve(JSON.parse(res.data));
+        }
+      },
+      fail:(err)=>{
+        Taro.showToast({
+            title: '请求失败了，请稍后重试。',
+            icon: 'error'
+        })
+        reject(err.errMsg)
+      }
+    });
+  });
+};
+
+// 删除文件
+export const removeFile = (url: string) => {
+  return new Promise<API.ResultType>((resolve, reject) => {
+    Taro.request({
+      url,
+      method: 'GET',
+      success: (res) => {
+        if (res && res.data) {
+          resolve(res.data);
         }
       },
       fail:(err)=>{

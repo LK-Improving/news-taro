@@ -1,13 +1,15 @@
+import Taro from "@tarojs/taro";
+
 // 函数防抖
-export const debounce = (fn: Function, delay: number,preFn:Function|undefined =undefined) => {
+export const debounce = (
+  fn: Function,
+  delay: number
+) => {
   let t = null;
-  if (preFn) {
-    preFn()
-  }
   return () => {
     if (t !== null) {
-        console.log('clear');
-        
+      console.log("clear");
+
       clearTimeout(t);
     }
     t = setTimeout(() => {
@@ -29,3 +31,14 @@ export const throllte = (fn: Function, delay: number) => {
     flag = false;
   };
 };
+
+// 是否登录
+export function isAuth() {
+  if (!!!Taro.getStorageSync("memberInfo")) {
+    Taro.showToast({
+      title: "您还未登录,请登录后使用",
+      icon: "error"
+    });
+  }
+  return !!Taro.getStorageSync("memberInfo");
+}

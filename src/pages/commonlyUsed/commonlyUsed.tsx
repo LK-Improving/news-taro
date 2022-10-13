@@ -46,10 +46,12 @@ const NavList: NavType[] = [
 
 const CommonlyUsed: React.FC = () => {
   // 当前分类
-  const [key, setKey] = useState<number>(0);
+  const [key, setKey] = useState<number | null>(0);
 
   // 文章LIst
-  const [articleList, setArticleList] = useState<API.ArticleType[]>([]);
+  const [articleList, setArticleList] = useState<
+    (API.ArticleType & { id: string })[]
+  >([]);
 
   // 评论LIst
   const [commentList, setCommentList] = useState<
@@ -74,7 +76,9 @@ const CommonlyUsed: React.FC = () => {
   // 初始化
   useEffect(() => {
     if (param.key) {
-      setKey(parseInt(param.key));
+      setKey(parseInt(param.key))
+    } else{
+      Taro.navigateBack()
     }
   }, []);
   // 监听分类
@@ -89,7 +93,7 @@ const CommonlyUsed: React.FC = () => {
       push();
     }
   }, [page]);
-  const isComment = NavList[key].value === "Comment";
+  const isComment = key && NavList[key].value === "Comment";
   // 设置文章
   const set = async () => {
     if (isComment) {
@@ -127,7 +131,7 @@ const CommonlyUsed: React.FC = () => {
       memberId: memberInfo.memberId || null
     };
 
-    const res = (await memberApi[`req${NavList[key].value}Article`](
+    const res = (await memberApi[`req${NavList[key!].value}Article`](
       params
     )) as API.ResultType & {
       page: API.PageType & {
@@ -150,7 +154,7 @@ const CommonlyUsed: React.FC = () => {
       memberId: memberInfo.memberId || null
     };
 
-    const res = (await memberApi[`req${NavList[key].value}Article`](
+    const res = (await memberApi[`req${NavList[key!].value}Article`](
       params
     )) as API.ResultType & {
       page: API.PageType & { list: API.ArticleType[] };
@@ -163,7 +167,6 @@ const CommonlyUsed: React.FC = () => {
 
   // 切换导航
   const handleChangeKey: EventProps["onClick"] = e => {
-    console.log(e);
     setKey(e.currentTarget.dataset.key);
   };
 
@@ -183,6 +186,7 @@ const CommonlyUsed: React.FC = () => {
 
   // 删除评论
   const handeleDelComment: EventProps["onClick"] = e => {
+    e.stopPropagation();
     const id = e.currentTarget.id;
     Taro.showModal({
       title: "提示",
@@ -199,10 +203,29 @@ const CommonlyUsed: React.FC = () => {
     });
   };
 
+  // 删除
+  const handeleDel: EventProps["onClick"] = e => {
+    e.stopPropagation();
+    const id = e.currentTarget.id;
+    Taro.showModal({
+      title: "提示",
+      content: `确定要删除该条${NavList[key!].title}吗！`,
+      success: async res2 => {
+        if (res2.confirm) {
+          const res = await memberApi[`reqDel${NavList[key!].value}ById`]([id]);
+          if (res && res.code === 0) {
+            // 过滤
+            setArticleList(articleList.filter(item => item.id != id));
+          }
+        }
+      }
+    });
+  };
   // 跳转页面
   const to = (url: string) => {
+    console.log(url);
     Taro.navigateTo({
-      url: url
+      url
     });
   };
   return (
@@ -213,7 +236,7 @@ const CommonlyUsed: React.FC = () => {
         scrollX
         scrollWithAnimation
         enableFlex
-        scrollIntoView={key+''}
+        scrollIntoView={"nav-" + key}
       >
         {NavList.map((item, index) => {
           return (
@@ -309,8 +332,16 @@ const CommonlyUsed: React.FC = () => {
           enable-back-to-top
           onScrollToLower={handleScrollToLower}
         >
-          {articleList.map(item => {
-            return <ArticleCard key={item.articleId} article={item} to={to} />;
+          {articleList.map((item, index) => {
+            return (
+              <ArticleCard
+                key={index}
+                article={item}
+                to={to}
+                headerTo={to}
+                handeleDel={handeleDel}
+              />
+            );
           })}
         </ScrollView>
       ) : (

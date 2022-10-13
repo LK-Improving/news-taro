@@ -33,6 +33,11 @@ const config = {
     enable: true // Webpack 持久化缓存配置，建议开启。默认配置请参考：https://docs.taro.zone/docs/config-detail#cache
   },
   mini: {
+    prerender: {
+      match: 'pages/home/**', // 所有以 `pages/shop/` 开头的页面都参与 prerender
+      // include: ['pages/any/way/index'], // `pages/any/way/index` 也会参与 prerender
+      // exclude: ['pages/shop/index/index'] // `pages/shop/index/index` 不用参与 prerender
+    },
     postcss: {
       pxtransform: {
         enable: true,

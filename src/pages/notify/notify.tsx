@@ -53,7 +53,7 @@ const Notify: React.FC = () => {
   // 合并文章
   const push = async () => {
     let res = await getNotiftList();
-    // setArticleList(articleList.concat(res.list));
+    setnotifyList(notifyList.concat(res.list));
     isThrottle = false;
     Taro.hideLoading();
   };
@@ -100,6 +100,7 @@ const Notify: React.FC = () => {
 
   // 删除通知
   const handleDelNotify: EventProps["onClick"] = e => {
+    e.stopPropagation()
     Taro.showModal({
       title: "提示",
       content: "真的要删除该条通知吗！",

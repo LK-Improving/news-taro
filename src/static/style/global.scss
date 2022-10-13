@@ -1,4 +1,4 @@
-//  默认颜色
+//  主题色
 $primaryColor:#e98e97;
 
 @mixin defaultBtn {
@@ -22,7 +22,7 @@ $primaryColor:#e98e97;
 @mixin portrait($size:60px) {
     width: $size;
     height: $size;
-    border-radius: $size;
+    border-radius: 100%;
 }
 
 // 单行文本省略
